@@ -34,45 +34,45 @@ sys.path.insert(1, _PARENT_DIR)
 import argcheck as ac
 
 
-def valid_no_deco_0_params_no_annots():
+def no_deco_0_params_no_annots():
     pass
 
 
-def valid_no_deco_1_params_no_annots(param):
+def no_deco_1_params_no_annots(param):
     return param
 
 
-def valid_no_deco_2_params_no_annots(param_1, param_2):
+def no_deco_2_params_no_annots(param_1, param_2):
     return param_1
 
 
 @ac.validate_call
-def valid_deco_0_params_no_annots():
+def deco_0_params_no_annots():
     pass
 
 
 @ac.validate_call
-def valid_deco_1_params_no_annots(param):
+def deco_1_params_no_annots(param):
     return param
 
 
 @ac.validate_call
-def valid_deco_2_params_no_annots(param_1, param_2):
+def deco_2_params_no_annots(param_1, param_2):
     return param_1
 
 
 @ac.validate_call
-def valid_deco_2_params_int_annot_1(param_1: int, param_2):
+def deco_2_params_int_annot_1(param_1: int, param_2):
     return param_1
 
 
 @ac.validate_call
-def valid_deco_2_params_int_annot_2(param_1, param_2: int):
+def deco_2_params_int_annot_2(param_1, param_2: int):
     return param_1
 
 
 @ac.validate_call
-def valid_deco_2_params_int_annot_1_2(param_1: int, param_2: int):
+def deco_2_params_int_annot_1_2(param_1: int, param_2: int):
     return param_1
 
 
@@ -82,7 +82,7 @@ _TESTS = [
     # Test(description,
     Test("no decorator: 0 params, no annots, 0 pos-args",
             # function to call,
-            valid_no_deco_0_params_no_annots,
+            no_deco_0_params_no_annots,
             # function positional arguments (a tuple),
             (),
             # function keyword arguments (a dict),
@@ -95,17 +95,17 @@ _TESTS = [
             None),
 
     Test("no decorator: 1 params, no annots, 1 pos-args",
-            valid_no_deco_1_params_no_annots,
+            no_deco_1_params_no_annots,
             (get_random_int(),), {},
             None, None, None),
 
     Test("no decorator: 2 params, no annots, 2 pos-args",
-            valid_no_deco_2_params_no_annots,
+            no_deco_2_params_no_annots,
             (get_random_int(), get_random_int(),), {},
             None, None, None),
 
     Test("no decorator: 2 params, no annots, too few pos-args (expect exception)",
-            valid_no_deco_2_params_no_annots,
+            no_deco_2_params_no_annots,
             (get_random_int(),), {},
             TypeError,
             'TypeError("{test.func.__name__}() missing 1 required positional argument: \'param_2\'",)',
@@ -113,7 +113,7 @@ _TESTS = [
     ),
 
     Test("no decorator: 2 params, no annots, too many pos-args (expect exception)",
-            valid_no_deco_2_params_no_annots,
+            no_deco_2_params_no_annots,
             (get_random_int(), get_random_int(), get_random_int(),), {},
             TypeError,
             "TypeError('{test.func.__name__}() takes 2 positional arguments but 3 were given',)",
@@ -121,7 +121,7 @@ _TESTS = [
     ),
 
     Test("no decorator: 1 params, no annots, undeclared kwd-arg (expect exception)",
-            valid_no_deco_1_params_no_annots,
+            no_deco_1_params_no_annots,
             (get_random_int(),),
             dict(undeclared_kwd=get_random_int(),),
             TypeError,
@@ -130,22 +130,22 @@ _TESTS = [
     ),
 
     Test("@validate_call: 0 params, no annots, 0 pos-args",
-            valid_deco_0_params_no_annots,
+            deco_0_params_no_annots,
             (), {},
             None, None, None),
 
     Test("@validate_call: 1 params, no annots, 1 pos-args",
-            valid_deco_1_params_no_annots,
+            deco_1_params_no_annots,
             (get_random_int(),), {},
             None, None, None),
 
     Test("@validate_call: 2 params, no annots, 2 pos-args",
-            valid_deco_2_params_no_annots,
+            deco_2_params_no_annots,
             (get_random_int(), get_random_int(),), {},
             None, None, None),
 
     Test("@validate_call: 2 params, no annots, too few pos-args (expect exception)",
-            valid_deco_2_params_no_annots,
+            deco_2_params_no_annots,
             (get_random_int(),), {},
             ac.exceptions.CallArgBindingRejection,
             'CallArgBindingRejection(exception_args=("missing a required argument: \'param_2\'",))',
@@ -153,7 +153,7 @@ _TESTS = [
     ),
 
     Test("@validate_call: 2 params, no annots, too many pos-args (expect exception)",
-            valid_deco_2_params_no_annots,
+            deco_2_params_no_annots,
             (get_random_int(), get_random_int(), get_random_int(),), {},
             ac.exceptions.CallArgBindingRejection,
             "CallArgBindingRejection(exception_args=('too many positional arguments',))",
@@ -161,7 +161,7 @@ _TESTS = [
     ),
 
     Test("@validate_call: 1 params, no annots, undeclared kwd-arg (expect exception)",
-            valid_deco_1_params_no_annots,
+            deco_1_params_no_annots,
             (get_random_int(),),
             dict(undeclared_kwd=get_random_int(),),
             ac.exceptions.CallArgBindingRejection,
@@ -170,17 +170,17 @@ _TESTS = [
     ),
 
     Test("@validate_call: 2 params, (param_1: int), args(int, int)",
-            valid_deco_2_params_int_annot_1,
+            deco_2_params_int_annot_1,
             (get_random_int(), get_random_int(),), {},
             None, None, None),
 
     Test("@validate_call: 2 params, (param_1: int), args(int, str)",
-            valid_deco_2_params_int_annot_1,
+            deco_2_params_int_annot_1,
             (get_random_int(), "hello",), {},
             None, None, None),
 
     Test("@validate_call: 2 params, (param_1: int), args(str, int) (expect exception)",
-            valid_deco_2_params_int_annot_1,
+            deco_2_params_int_annot_1,
             ("hello", get_random_int(),), {},
             ac.exceptions.CallArgTypeCheckViolation,
             "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='param_1'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
@@ -188,12 +188,12 @@ _TESTS = [
     ),
 
     Test("@validate_call: 2 params, (param_2: int), args(int, int)",
-            valid_deco_2_params_int_annot_2,
+            deco_2_params_int_annot_2,
             (get_random_int(), get_random_int(),), {},
             None, None, None),
 
     Test("@validate_call: 2 params, (param_2: int), args(int, str) (expect exception)",
-            valid_deco_2_params_int_annot_2,
+            deco_2_params_int_annot_2,
             (get_random_int(), "hello",), {},
             ac.exceptions.CallArgTypeCheckViolation,
             "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=1, param_name='param_2'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=1, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
@@ -201,7 +201,7 @@ _TESTS = [
     ),
 
     Test("@validate_call: 2 params, (param_2: int), args(str, int)",
-            valid_deco_2_params_int_annot_2,
+            deco_2_params_int_annot_2,
             ("hello", get_random_int(),), {},
             None, None, None),
 
