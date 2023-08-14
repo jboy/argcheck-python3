@@ -17,6 +17,7 @@
 # to stderr.
 
 import os
+import sys
 
 from collections import namedtuple
 from utils_for_tests import get_random_int
@@ -24,7 +25,6 @@ from utils_for_tests import get_random_int
 # Yay for Python relative imports.  A very popular topic on Stack Overflow!
 _TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
 _PARENT_DIR = os.path.dirname(_TESTS_DIR)
-import sys
 # We assume that `sys.path[0]` is the current directory; don't change this.
 # But we want the parent directory to be checked immediately after.
 # If you insert a value at any index in an empty list (even a non-zero index),
@@ -107,18 +107,41 @@ _TESTS = [
 ]
 
 
+def _die(msg):
+    print("%s\nTests aborted." % msg, file=sys.stderr)
+    sys.exit(-1)
+
+
+def _complain_test_failure(test_idx, test, complaint, extra_info={}):
+    if extra_info:
+        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\nExtra info: %s" %
+                (test_idx, test.descr, test.func.__name__,
+                        test.pos_args, test.kwd_args,
+                        complaint, extra_info))
+    else:
+        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s" %
+                (test_idx, test.descr, test.func.__name__,
+                        test.pos_args, test.kwd_args,
+                        complaint))
+
+
 def _run_test(test_idx, test):
     print("[%d] %s" % (test_idx, test.descr))
 
     # To verify that return values work properly, all test functions will
     # return the first positional argument (if supplied); else `None`.
-    return_val = test.func(*test.pos_args, **test.kwd_args)
-    if test.pos_args:
-        assert return_val == test.pos_args[0]
-    else:
-        assert return_val is None
+    expect_return_val = (test.pos_args[0] if test.pos_args else None)
 
-    # In case of failure: Report `test.func.__name__`
+    return_val = test.func(*test.pos_args, **test.kwd_args)
+
+    if ((expect_return_val is None and return_val is not None) or
+        (expect_return_val is not None and return_val != expect_return_val)):
+            _complain_test_failure(test_idx, test,
+                    "incorrect return value",
+                    extra_info=dict(
+                            expected=expect_return_val,
+                            received=return_val,
+            ))
 
 
 def _run_all_tests():
