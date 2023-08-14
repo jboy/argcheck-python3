@@ -86,7 +86,7 @@ _TESTS = [
 
     Test("normal Python (no deco): 2 params, no annots, 2 pos-args",
             valid_no_deco_2_params_no_annots,
-            (get_random_int(), get_random_int()), {},
+            (get_random_int(), get_random_int(),), {},
             None, None, None),
 
     Test("normal Python (no deco): 2 params, no annots, too few pos-args",
@@ -99,10 +99,19 @@ _TESTS = [
 
     Test("normal Python (no deco): 2 params, no annots, too many pos-args",
             valid_no_deco_2_params_no_annots,
-            (get_random_int(), get_random_int(), get_random_int()), {},
+            (get_random_int(), get_random_int(), get_random_int(),), {},
             TypeError,
             "TypeError('{test.func.__name__}() takes 2 positional arguments but 3 were given',)",
             '{test.func.__name__}() takes 2 positional arguments but 3 were given',
+    ),
+
+    Test("normal Python (no deco): 1 params, no annots, undeclared kwd-arg",
+            valid_no_deco_1_params_no_annots,
+            (get_random_int(),),
+            dict(undeclared_kwd=get_random_int(),),
+            TypeError,
+            'TypeError("{test.func.__name__}() got an unexpected keyword argument \'undeclared_kwd\'",)',
+            "{test.func.__name__}() got an unexpected keyword argument 'undeclared_kwd'",
     ),
 
     Test("@validate_call: 0 params, no annots, 0 pos-args",
@@ -117,7 +126,7 @@ _TESTS = [
 
     Test("@validate_call: 2 params, no annots, 2 pos-args",
             valid_deco_2_params_no_annots,
-            (get_random_int(), get_random_int()), {},
+            (get_random_int(), get_random_int(),), {},
             None, None, None),
 
 ]
