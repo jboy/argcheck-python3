@@ -61,6 +61,21 @@ def valid_deco_2_params_no_annots(param_1, param_2):
     return param_1
 
 
+@ac.validate_call
+def valid_deco_2_params_int_annot_1(param_1: int, param_2):
+    return param_1
+
+
+@ac.validate_call
+def valid_deco_2_params_int_annot_2(param_1, param_2: int):
+    return param_1
+
+
+@ac.validate_call
+def valid_deco_2_params_int_annot_1_2(param_1: int, param_2: int):
+    return param_1
+
+
 Test = namedtuple("Test", "descr func pos_args kwd_args ex_type ex_repr ex_str")
 
 _TESTS = [
@@ -153,6 +168,42 @@ _TESTS = [
             'CallArgBindingRejection(exception_args=("got an unexpected keyword argument \'undeclared_kwd\'",))',
             'unable to bind function call argument: "got an unexpected keyword argument \'undeclared_kwd\'"',
     ),
+
+    Test("@validate_call: 2 params, int annot on param 1, pos args (int, int)",
+            valid_deco_2_params_int_annot_1,
+            (get_random_int(), get_random_int(),), {},
+            None, None, None),
+
+    Test("@validate_call: 2 params, int annot on param 1, pos args (int, str)",
+            valid_deco_2_params_int_annot_1,
+            (get_random_int(), "hello",), {},
+            None, None, None),
+
+    Test("@validate_call: 2 params, int annot on param 1, pos args (str, int)",
+            valid_deco_2_params_int_annot_1,
+            ("hello", get_random_int(),), {},
+            ac.exceptions.CallArgTypeCheckViolation,
+            "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='param_1'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+            "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='param_1' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')",
+    ),
+
+    Test("@validate_call: 2 params, int annot on param 2, pos args (int, int)",
+            valid_deco_2_params_int_annot_2,
+            (get_random_int(), get_random_int(),), {},
+            None, None, None),
+
+    Test("@validate_call: 2 params, int annot on param 2, pos args (int, str)",
+            valid_deco_2_params_int_annot_2,
+            (get_random_int(), "hello",), {},
+            ac.exceptions.CallArgTypeCheckViolation,
+            "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=1, param_name='param_2'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=1, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+            "violation of type check `isTypeEqualTo(type_declared=int)` for param [1]='param_2' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=1, arg_val='hello')",
+    ),
+
+    Test("@validate_call: 2 params, int annot on param 2, pos args (str, int)",
+            valid_deco_2_params_int_annot_2,
+            ("hello", get_random_int(),), {},
+            None, None, None),
 
 ]
 
