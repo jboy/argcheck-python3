@@ -129,6 +129,31 @@ _TESTS = [
             (get_random_int(), get_random_int(),), {},
             None, None, None),
 
+    Test("@validate_call: 2 params, no annots, too few pos-args",
+            valid_deco_2_params_no_annots,
+            (get_random_int(),), {},
+            ac.exceptions.CallArgBindingRejection,
+            'CallArgBindingRejection(exception_args=("missing a required argument: \'param_2\'",))',
+            'unable to bind function call argument: "missing a required argument: \'param_2\'"',
+    ),
+
+    Test("@validate_call: 2 params, no annots, too many pos-args",
+            valid_deco_2_params_no_annots,
+            (get_random_int(), get_random_int(), get_random_int(),), {},
+            ac.exceptions.CallArgBindingRejection,
+            "CallArgBindingRejection(exception_args=('too many positional arguments',))",
+            "unable to bind function call argument: 'too many positional arguments'",
+    ),
+
+    Test("@validate_call: 1 params, no annots, undeclared kwd-arg",
+            valid_deco_1_params_no_annots,
+            (get_random_int(),),
+            dict(undeclared_kwd=get_random_int(),),
+            ac.exceptions.CallArgBindingRejection,
+            'CallArgBindingRejection(exception_args=("got an unexpected keyword argument \'undeclared_kwd\'",))',
+            'unable to bind function call argument: "got an unexpected keyword argument \'undeclared_kwd\'"',
+    ),
+
 ]
 
 
