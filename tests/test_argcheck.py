@@ -65,7 +65,7 @@ Test = namedtuple("Test", "descr func pos_args kwd_args ex_type ex_repr ex_str")
 
 _TESTS = [
     # Test(description,
-    Test("normal Python (no decorator): 0 params, no annots, 0 pos-args",
+    Test("normal Python (no deco): 0 params, no annots, 0 pos-args",
             # function to call,
             valid_no_deco_0_params_no_annots,
             # function positional arguments (a tuple),
@@ -74,32 +74,48 @@ _TESTS = [
             {},
             # expected exception type,
             None,
-            # expected `str(exception)`
-            None,
             # expected `repr(exception)`
+            None,
+            # expected `str(exception)`
             None),
 
-    Test("normal Python (no decorator): 1 params, no annots, 1 pos-args",
+    Test("normal Python (no deco): 1 params, no annots, 1 pos-args",
             valid_no_deco_1_params_no_annots,
             (get_random_int(),), {},
             None, None, None),
 
-    Test("normal Python (no decorator): 2 params, no annots, 2 pos-args",
+    Test("normal Python (no deco): 2 params, no annots, 2 pos-args",
             valid_no_deco_2_params_no_annots,
             (get_random_int(), get_random_int()), {},
             None, None, None),
 
-    Test("with decorator: 0 params, no annots, 0 pos-args",
+    Test("normal Python (no deco): 2 params, no annots, too few pos-args",
+            valid_no_deco_2_params_no_annots,
+            (get_random_int(),), {},
+            TypeError,
+            'TypeError("{test.func.__name__}() missing 1 required positional argument: \'param_2\'",)',
+            "{test.func.__name__}() missing 1 required positional argument: 'param_2'",
+    ),
+
+    Test("normal Python (no deco): 2 params, no annots, too many pos-args",
+            valid_no_deco_2_params_no_annots,
+            (get_random_int(), get_random_int(), get_random_int()), {},
+            TypeError,
+            "TypeError('{test.func.__name__}() takes 2 positional arguments but 3 were given',)",
+            '{test.func.__name__}() takes 2 positional arguments but 3 were given',
+    ),
+
+    Test("@validate_call: 0 params, no annots, 0 pos-args",
             valid_deco_0_params_no_annots,
             (), {},
             None, None, None),
 
-    Test("with decorator: 1 params, no annots, 1 pos-args",
+    Test("@validate_call: 1 params, no annots, 1 pos-args",
             valid_deco_1_params_no_annots,
             (get_random_int(),), {},
             None, None, None),
 
-    Test("with decorator: 2 params, no annots, 2 pos-args",
+    Test("@validate_call: 2 params, no annots, 2 pos-args",
             valid_deco_2_params_no_annots,
             (get_random_int(), get_random_int()), {},
             None, None, None),
@@ -108,43 +124,129 @@ _TESTS = [
 
 
 def _die(msg):
+    """Print supplied message `msg` and terminate the test-script process.
+
+    Just like the `die` function in Perl.
+    """
     print("%s\nTests aborted." % msg, file=sys.stderr)
     sys.exit(-1)
 
 
-def _complain_test_failure(test_idx, test, complaint, extra_info={}):
+def _complain_test_failure(test_idx, test, *, complaint, extra_info={}):
+    """Complain about the failure of test `test` (at test-index `test_idx`).
+
+    State the complaint in `complaint`; provide any extra info in `extra_info`.
+
+    At the end of this function, `_die` will be called to terminate the process.
+    """
     if extra_info:
-        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\nExtra info: %s" %
+        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\nExtra info: %s\n" %
                 (test_idx, test.descr, test.func.__name__,
                         test.pos_args, test.kwd_args,
                         complaint, extra_info))
     else:
-        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s" %
+        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\n" %
                 (test_idx, test.descr, test.func.__name__,
                         test.pos_args, test.kwd_args,
                         complaint))
 
 
 def _run_test(test_idx, test):
+    """Run a single test `test` (at test-index `test_idx`).
+
+    If the test fails (by raising or returning anything unexpected/incorrect),
+    the function `_complain_test_failure` will be called to report tho failure.
+    """
     print("[%d] %s" % (test_idx, test.descr))
+
+    # Validate the types of the attribute values in this test,
+    # to ensure that we've actually hard-coded this test correctly.
+    assert isinstance(test.descr, str)
+    assert isinstance(test.pos_args, tuple)
+    assert isinstance(test.kwd_args, dict)
+    assert isinstance(test.ex_type, type) or test.ex_type is None
+    assert isinstance(test.ex_repr, str) or test.ex_repr is None
+    assert isinstance(test.ex_str, str) or test.ex_str is None
 
     # To verify that return values work properly, all test functions will
     # return the first positional argument (if supplied); else `None`.
     expect_return_val = (test.pos_args[0] if test.pos_args else None)
 
-    return_val = test.func(*test.pos_args, **test.kwd_args)
+    try:
+        return_val = test.func(*test.pos_args, **test.kwd_args)
 
-    if ((expect_return_val is None and return_val is not None) or
-        (expect_return_val is not None and return_val != expect_return_val)):
+        # No exception was raised.
+        # Let's check the test-function return value.
+        if ((expect_return_val is None and return_val is not None) or
+            (expect_return_val is not None and return_val != expect_return_val)):
+                _complain_test_failure(test_idx, test,
+                        complaint="incorrect return value",
+                        extra_info=dict(
+                                expected=expect_return_val,
+                                received=return_val,
+                        )
+                )
+
+    except Exception as e:
+        # An exception was raised.
+        # However, that might be exactly what this test expects...
+        expect_ex_type = test.ex_type
+        if test.ex_type is None:
+            # Nope, an exception was NOT expected.
             _complain_test_failure(test_idx, test,
-                    "incorrect return value",
+                    complaint="unexpected exception raised",
                     extra_info=dict(
-                            expected=expect_return_val,
-                            received=return_val,
-            ))
+                            raised_ex_type=type(e),
+                            raised_ex_repr=repr(e),
+                    )
+            )
+        if not isinstance(e, test.ex_type):
+            # An exception was NOT expected... but not this exception type!
+            _complain_test_failure(test_idx, test,
+                    complaint="incorrect exception type raised",
+                    extra_info=dict(
+                            expected_ex_type=test.ex_type,
+                            raised_ex_type=type(e),
+                            raised_ex_repr=repr(e),
+                    )
+            )
+
+        # If we got to here, the exception type that was raised, was expected.
+        # Now we check the error message, to verify that it's complaining about
+        # the correct problem.
+        expect_ex_repr = test.ex_repr
+        if (expect_ex_repr is not None) and ("{test." in expect_ex_repr):
+            # It's a format string!
+            expect_ex_repr = expect_ex_repr.format(test=test)
+
+        if expect_ex_repr != repr(e):
+            # Uh-oh... wrong error message.
+            _complain_test_failure(test_idx, test,
+                    complaint="incorrect `repr()` for raised exception",
+                    extra_info=dict(
+                            expected_ex_repr=expect_ex_repr,
+                            raised_ex_repr=repr(e),
+                    )
+            )
+
+        expect_ex_str = test.ex_str
+        if (expect_ex_str is not None) and ("{test." in expect_ex_str):
+            # It's a format string!
+            expect_ex_str = expect_ex_str.format(test=test)
+
+        if expect_ex_str != str(e):
+            # Uh-oh... wrong error message.
+            _complain_test_failure(test_idx, test,
+                    complaint="incorrect `str()` for raised exception",
+                    extra_info=dict(
+                            expected_ex_str=expect_ex_str,
+                            raised_ex_str=str(e),
+                    )
+            )
 
 
 def _run_all_tests():
+    """Run each test in module-variable list `_TESTS` (a list of `Test`)."""
     for test_idx, test in enumerate(_TESTS):
         _run_test(test_idx, test)
 
