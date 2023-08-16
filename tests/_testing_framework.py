@@ -1,6 +1,7 @@
 import random
 import sys
 
+from inspect import signature
 from typing import Sequence
 
 
@@ -58,16 +59,8 @@ class ExpectedReturn:
     can never know whether a parameter's value was passed in by a caller
     or is the declared default value for that parameter.
 
-    Ironically, we can't simply `inspect` the test-function signature
-    (which is, after all, the basis of the functionality of `argcheck`)
-    because the test-function is likely to be wrapped by a decorator that
-    has its own signature.
-
-    So we must look at the test-function signature ourselves, and hard-code
-    whatever return-value we expect (to be received in `expected_value`).
-
     But if it's the simple case (where we are definitely passing an argument
-    into the first declared parameter of the test function), we can instead
+    into the first declared parameter of the test function), we can simply
     specify `expected_value=Ellipsis`, meaning "It's whatever we supplied."
     """
     def __init__(self, *, arg_idx_or_kwd, expected_value=Ellipsis):
@@ -144,12 +137,12 @@ def _run_test(test_idx: int, test_case: TestCase, *,
     if info_stream is not None:
         test_summary = "[{idx}] {t.descr}".format(idx=test_idx, t=test_case)
         if isinstance(expected, ExpectedException):
-            test_summary += " (expect exception)"
+            test_summary += " => expect exception"
         print(test_summary, file=info_stream)
 
         if verbose_info:
-            print("Function: {t.func.__name__}\nPos-args: {t.pos_args}\nKwd-args: {t.kwd_args}\nExpected: {t.expected}\n".format(
-                    t=test_case),
+            print("Function: {t.func.__name__}\nFunc-sig: {sig}\nPos-args: {t.pos_args}\nKwd-args: {t.kwd_args}\nExpected: {t.expected}\n".format(
+                    t=test_case, sig=signature(test_case.func)),
                     file=info_stream)
 
     try:
