@@ -34,15 +34,43 @@ sys.path.insert(1, _PARENT_DIR)
 import argcheck as ac
 
 
-# NOTE: The following functions are NOT test-cases.  They are merely *inputs*
-# to the test-cases:  Recepients of function-call arguments, with or without
-# the `@validate_call` decorator, with or without parameter type annotations,
-# to be invoked and *tested* by the test-cases.
+# NOTE: The following functions are NOT test-cases.  They are merely
+# *inputs* to the test-cases: recepients of function-call arguments,
+# with or without the `@validate_call` decorator, and with or without
+# parameter type annotations, to be invoked and *tested* by test-cases.
 #
 # Each of these functions may be called by any number of test-cases.
 #
-# The names of these functions also have no significance
-# (other than to be unique and vaguely-descriptive).
+# The names of these functions also have no significance (other than
+# to be unique and vaguely-descriptive).
+
+
+# To verify that argument-passing and value-returning work properly
+# (without getting too complicated), every test-function should be
+# coded so that it returns either:
+#   - the argument passed to a specific one of its parameters; or
+#   - a hard-coded constant value.
+#
+# It is preferable for the test-function to return the argument passed
+# to one of its parameters (so that the connection between arguments
+# and return-values can be verified).
+#
+# But if a function declares no parameters (and thus, cannot take any
+# arguments), the function should return a hard-coded constant value.
+#
+# Whatever the test-function returns (whether a parameter argument or
+# a hard-coded constant value), it should not change.  This enables
+# the test-code writer to read the test-function and predict what the
+# return-value will be.  The test-case can then be coded accordingly.
+#
+# By convention, if a parameter argument is returned, the parameter
+# returned should be the first declared parameter.  And by convention,
+# if a function declares no parameters, it should return `None` as the
+# hard-coded constant value.
+#
+# But neither of these conventions is strictly required, just as long
+# as *which* parameter is returned does not change; and as long as the
+# value of the constant does not change.
 
 
 def no_deco_0_params_no_annots():

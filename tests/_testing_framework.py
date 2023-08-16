@@ -48,18 +48,33 @@ class ExpectedReturn:
     """How to calculate what return-value to expect from the test-function.
 
     To verify that argument-passing and value-returning work properly
-    (without getting too complicated), every test-function will return
-    the value of the argument passed to its first declared parameter
-    (if the test-function declares any parameters at all).
+    (without getting too complicated), every test-function should be
+    coded so that it returns either:
+      - the argument passed to a specific one of its parameters; or
+      - a hard-coded constant value.
 
-    This is complicated slightly by functions that declare no parameters.
-    The solution to this is easy enough: The function will return `None`.
+    It is preferable for the test-function to return the argument passed
+    to one of its parameters (so that the connection between arguments
+    and return-values can be verified).
 
-    It's complicated slightly more by default values, because a function
-    can never know whether a parameter's value was passed in by a caller
-    or is the declared default value for that parameter.
+    But if a function declares no parameters (and thus, cannot take any
+    arguments), the function should return a hard-coded constant value.
 
-    But if it's the simple case (where we are definitely passing an argument
+    Whatever the test-function returns (whether a parameter argument or
+    a hard-coded constant value), it should not change.  This enables
+    the test-code writer to read the test-function and predict what the
+    return-value will be.  The test-case can then be coded accordingly.
+
+    By convention, if a parameter argument is returned, the parameter
+    returned should be the first declared parameter.  And by convention,
+    if a function declares no parameters, it should return `None` as the
+    hard-coded constant value.
+
+    But neither of these conventions is strictly required, just as long
+    as *which* parameter is returned does not change; and as long as the
+    value of the constant does not change.
+
+    If it's the simple case (where we are definitely passing an argument
     into the first declared parameter of the test function), we can simply
     specify `expected_value=Ellipsis`, meaning "It's whatever we supplied."
     """
@@ -163,18 +178,6 @@ def _run_test(test_idx: int, test_case: TestCase, *,
 
         # OK, we *were* expecting a return-value rather than an exception.
         # Let's check the return value.
-        #
-        # To verify that argument-passing and value-returning work properly
-        # (without getting too complicated), every test-function will return
-        # the value of the argument passed to its first declared parameter
-        # (if the test-function declares any parameters at all).
-        #
-        # This is complicated slightly by functions that declare no parameters.
-        # The solution to this is easy enough: The function will return `None`.
-        #
-        # It's complicated slightly more by default values, because a function
-        # can never know whether a parameter's value was passed in by a caller
-        # or is the declared default value for that parameter.
         if isinstance(expected.arg_idx_or_kwd, int):
             # Expected return-value was supplied as a positional argument.
             assert expected.expected_value is Ellipsis
