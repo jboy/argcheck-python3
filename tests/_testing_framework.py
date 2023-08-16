@@ -6,7 +6,7 @@ from typing import Sequence
 
 class TestCase:
     """A single test-case to run."""
-    def __init__(self, descr, func, pos_args, kwd_args, expected):
+    def __init__(self, descr, func, pos_args: tuple, kwd_args: dict, expected):
         # Validate the types of the attributes in this TestCase,
         # to ensure that we've hard-coded our tests correctly.
         assert isinstance(descr, str)
@@ -95,7 +95,7 @@ class ExpectedReturn:
 
 class ExpectedException:
     """We expect the test-function to raise the specified exception."""
-    def __init__(self, ex_type, ex_repr, ex_str):
+    def __init__(self, ex_type: type, ex_repr: str, ex_str: str):
         # Validate the types of the attributes in this ExpectedException,
         # to ensure that we've hard-coded our tests correctly.
         assert isinstance(ex_type, type)
@@ -120,7 +120,7 @@ def get_random_int():
     return random.randint(-1000, 1000)
 
 
-def _run_test(test_idx, test_case):
+def _run_test(test_idx: int, test_case: TestCase):
     """Run a single test-case `test_case` (at test-index `test_idx`).
 
     If the test fails (by raising or returning anything unexpected/incorrect),
@@ -238,8 +238,9 @@ def _run_test(test_idx, test_case):
             )
 
 
-def _complain_test_failure(test_idx, test, *, complaint, extra_info={}):
-    """Complain about the failure of test `test` (at test-index `test_idx`).
+def _complain_test_failure(test_idx: int, test_case: TestCase, *,
+        complaint: str, extra_info={}):
+    """Complain about the failure of test-case `test_case`.
 
     State the complaint in `complaint`; provide any extra info in `extra_info`.
 
@@ -247,13 +248,13 @@ def _complain_test_failure(test_idx, test, *, complaint, extra_info={}):
     """
     if extra_info:
         _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\nExtra info: %s\n" %
-                (test_idx, test.descr, test.func.__name__,
-                        test.pos_args, test.kwd_args,
+                (test_idx, test_case.descr, test_case.func.__name__,
+                        test_case.pos_args, test_case.kwd_args,
                         complaint, extra_info))
     else:
         _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\n" %
-                (test_idx, test.descr, test.func.__name__,
-                        test.pos_args, test.kwd_args,
+                (test_idx, test_case.descr, test_case.func.__name__,
+                        test_case.pos_args, test_case.kwd_args,
                         complaint))
 
 
