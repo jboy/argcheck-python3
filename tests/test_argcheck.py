@@ -243,6 +243,28 @@ _TEST_CASES = [
                     "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
     ),
 
+    TestCase("@validate_call: params(p: int = \"hello\"), args(int)",
+            deco_1_params_annot_int_dflt_str,
+            (get_random_int(),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: params(p: int = \"hello\"), args()",
+            deco_1_params_annot_int_dflt_str,
+            (), {},
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='p'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
+    ),
+
+    TestCase("@validate_call: params(p: int = \"hello\"), args(str)",
+            deco_1_params_annot_int_dflt_str,
+            ("there",), {},
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='p'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='there'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='there')"),
+    ),
+
 ]
 
 
