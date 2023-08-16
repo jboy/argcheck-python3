@@ -84,10 +84,10 @@ class ExpectedReturn:
 
     def __str__(self):
         if isinstance(self.arg_idx_or_kwd, int):
-            return ("expected return-value supplied as positional argument %d" %
+            return ("expected return-value passed as positional argument %d" %
                     self.arg_idx_or_kwd)
         elif isinstance(self.arg_idx_or_kwd, str):
-            return ("expected return-value supplied as keyword argument %s" %
+            return ("expected return-value passed as keyword argument %s" %
                     repr(self.arg_idx_or_kwd))
         else:
             return ("expected return-value %s" % repr(self.expected_value))
@@ -112,7 +112,7 @@ class ExpectedException:
                 self=self, ctor_args=ctor_args)
 
     def __str__(self):
-        return ("expected exception %s" % self.ex_repr)
+        return ("expected exception %s" % self.ex_type.__name__)
 
 
 def get_random_int():
@@ -246,16 +246,13 @@ def _complain_test_failure(test_idx: int, test_case: TestCase, *,
 
     At the end of this function, `_die` will be called to terminate the process.
     """
+    msg = "\n{t.__class__.__name__}[{idx}] failed: \"{t.descr}\"\n\nFunction: {t.func.__name__}\nPos args: {t.pos_args}\nKwd args: {t.kwd_args}\nExpected: {t.expected}\n\nComplaint: {complaint}\n".format(
+            t=test_case, idx=test_idx, complaint=complaint)
+
     if extra_info:
-        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\nExtra info: %s\n" %
-                (test_idx, test_case.descr, test_case.func.__name__,
-                        test_case.pos_args, test_case.kwd_args,
-                        complaint, extra_info))
-    else:
-        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\n" %
-                (test_idx, test_case.descr, test_case.func.__name__,
-                        test_case.pos_args, test_case.kwd_args,
-                        complaint))
+        msg = "%sExtra info: %s\n" % (msg, extra_info)
+
+    _die(msg)
 
 
 def _die(msg: str, *, exit_status=-1):
