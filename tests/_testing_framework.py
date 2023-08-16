@@ -1,4 +1,7 @@
 import random
+import sys
+
+from typing import Sequence
 
 
 class TestCase:
@@ -17,6 +20,14 @@ class TestCase:
         self.pos_args = pos_args
         self.kwd_args = kwd_args
         self.expected = expected
+
+
+def run_all_tests(test_cases: Sequence[TestCase]):
+    """Run each test-case in `test_cases` (a Sequence of `TestCase`)."""
+    for test_idx, test_case in enumerate(test_cases):
+        _run_test(test_idx, test_case)
+
+    print("All tests passed: {n} of {n}".format(n=len(test_cases)))
 
 
 class ExpectedReturn:
@@ -107,4 +118,150 @@ class ExpectedException:
 def get_random_int():
     """Return a random integer in the range [-1000, 1000]."""
     return random.randint(-1000, 1000)
+
+
+def _run_test(test_idx, test_case):
+    """Run a single test-case `test_case` (at test-index `test_idx`).
+
+    If the test fails (by raising or returning anything unexpected/incorrect),
+    the function `_complain_test_failure` will be called to report the failure.
+    """
+    print("[%d] %s" % (test_idx, test_case.descr))
+    try:
+        return_val = test_case.func(*test_case.pos_args, **test_case.kwd_args)
+
+        # No exception was raised.
+        # Did we *expect* that no exception was raised?
+        # To put it another way:  Did we expect a return-value or an exception?
+        expected = test_case.expected
+        if not isinstance(expected, ExpectedReturn):
+            _complain_test_failure(test_idx, test_case,
+                    complaint="unexpected return value",
+                    extra_info=dict(
+                            expected=repr(expected),
+                            returned=repr(return_val),
+                    )
+            )
+
+        # OK, we *were* expecting a return-value rather than an exception.
+        # Let's check the return value.
+        #
+        # To verify that argument-passing and value-returning work properly
+        # (without getting too complicated), every test-function will return
+        # the value of the argument passed to its first declared parameter
+        # (if the test-function declares any parameters at all).
+        #
+        # This is complicated slightly by functions that declare no parameters.
+        # The solution to this is easy enough: The function will return `None`.
+        #
+        # It's complicated slightly more by default values, because a function
+        # can never know whether a parameter's value was passed in by a caller
+        # or is the declared default value for that parameter.
+        if isinstance(expected.arg_idx_or_kwd, int):
+            # Expected return-value was supplied as a positional argument.
+            assert expected.expected_value is Ellipsis
+            expected_return_val = test_case.pos_args[expected.arg_idx_or_kwd]
+        elif isinstance(expected.arg_idx_or_kwd, str):
+            # Expected return-value was supplied as a keyword argument.
+            assert expected.expected_value is Ellipsis
+            expected_return_val = test_case.kwd_args[expected.arg_idx_or_kwd]
+        else:
+            assert expected.arg_idx_or_kwd is None
+            expected_return_val = expected.expected_value
+
+        if expected_return_val != return_val:
+            _complain_test_failure(test_idx, test_case,
+                    complaint="incorrect return value",
+                    extra_info=dict(
+                            expected=expected_return_val,
+                            returned=return_val,
+                    )
+            )
+
+    except Exception as e:
+        # An exception was raised.
+        # Did we *expect* that an exception would be raised?
+        expected = test_case.expected
+        if not isinstance(expected, ExpectedException):
+            _complain_test_failure(test_idx, test_case,
+                    complaint="unexpected exception raised",
+                    extra_info=dict(
+                            expected=repr(expected),
+                            raised=repr(e),
+                    )
+            )
+
+        # OK, we *were* expecting an exception rather than a return-value.
+        # Let's check the exception (type & message) that was raised.
+
+        if not isinstance(e, expected.ex_type):
+            _complain_test_failure(test_idx, test_case,
+                    complaint="incorrect exception type raised",
+                    extra_info=dict(
+                            expected_ex_type=expected.ex_type,
+                            raised_ex_type=type(e),
+                            raised_ex_repr=repr(e),
+                    )
+            )
+
+        # If we got to here, the exception type that was raised, was expected.
+        # Now we check the error message, to verify that it's complaining about
+        # the expected problem.
+        expected_ex_repr = expected.ex_repr
+        if "{TestCase." in expected_ex_repr:
+            # It's a format string!
+            expected_ex_repr = expected_ex_repr.format(TestCase=test_case)
+
+        if expected_ex_repr != repr(e):
+            # Uh-oh... wrong error message.
+            _complain_test_failure(test_idx, test_case,
+                    complaint="incorrect `repr()` for raised exception",
+                    extra_info=dict(
+                            expected_ex_repr=expected_ex_repr,
+                            raised_ex_repr=repr(e),
+                    )
+            )
+
+        expected_ex_str = expected.ex_str
+        if "{TestCase." in expected_ex_str:
+            # It's a format string!
+            expected_ex_str = expected_ex_str.format(TestCase=test_case)
+
+        if expected_ex_str != str(e):
+            # Uh-oh... wrong error message.
+            _complain_test_failure(test_idx, test_case,
+                    complaint="incorrect `str()` for raised exception",
+                    extra_info=dict(
+                            expected_ex_str=expected_ex_str,
+                            raised_ex_str=str(e),
+                    )
+            )
+
+
+def _complain_test_failure(test_idx, test, *, complaint, extra_info={}):
+    """Complain about the failure of test `test` (at test-index `test_idx`).
+
+    State the complaint in `complaint`; provide any extra info in `extra_info`.
+
+    At the end of this function, `_die` will be called to terminate the process.
+    """
+    if extra_info:
+        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\nExtra info: %s\n" %
+                (test_idx, test.descr, test.func.__name__,
+                        test.pos_args, test.kwd_args,
+                        complaint, extra_info))
+    else:
+        _die("\nTest[%d] failed: \"%s\"\nFunction: %s\nPos args: %s\nKwd args: %s\n\nComplaint: %s\n" %
+                (test_idx, test.descr, test.func.__name__,
+                        test.pos_args, test.kwd_args,
+                        complaint))
+
+
+def _die(msg: str, *, exit_status=-1):
+    """Print supplied message `msg` and terminate the test-script process.
+
+    Just like the `die` function in Perl.
+    """
+    print("%s\nTests aborted." % msg, file=sys.stderr)
+    sys.exit(exit_status)
 
