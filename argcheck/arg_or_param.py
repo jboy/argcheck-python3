@@ -14,12 +14,12 @@ class _ObjectWithCtorArgsRepr(ABC):
 
 class _DeclFuncParam(_ObjectWithCtorArgsRepr):
     """Describe a single declared function parameter for exceptions."""
-    def __init__(self, param_idx, param_name):
-        self.idx = param_idx
-        self.name = param_name
+    def __init__(self, idx, name):
+        self.idx = idx
+        self.name = name
 
     def _ctor_args(self) -> str:
-        return "param_idx={self.idx}, param_name={self.name!r}".format(
+        return "idx={self.idx}, name={self.name!r}".format(
                 self=self)
 
     def __str__(self) -> str:
@@ -29,12 +29,12 @@ class _DeclFuncParam(_ObjectWithCtorArgsRepr):
 
 class _FuncCallArg(_ObjectWithCtorArgsRepr):
     """Describe a single function call argument for exceptions."""
-    def __init__(self, arg_idx_or_kwd, arg_val):
-        self.idx_or_kwd = arg_idx_or_kwd
-        self.val = arg_val
+    def __init__(self, idx_or_kwd, val):
+        self.idx_or_kwd = idx_or_kwd
+        self.val = val
 
     def _ctor_args(self) -> str:
-        return "arg_idx_or_kwd={self.idx_or_kwd!r}, arg_val={self.val!r}".format(
+        return "idx_or_kwd={self.idx_or_kwd!r}, val={self.val!r}".format(
                 self=self)
 
     def __str__(self) -> str:
