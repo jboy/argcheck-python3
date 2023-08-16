@@ -22,12 +22,23 @@ class TestCase:
         self.expected = expected
 
 
-def run_all_tests(test_cases: Sequence[TestCase]):
-    """Run each test-case in `test_cases` (a Sequence of `TestCase`)."""
-    for test_idx, test_case in enumerate(test_cases):
-        _run_test(test_idx, test_case)
+def run_all_tests(test_cases: Sequence[TestCase], *,
+        info_stream=sys.stdout, error_stream=sys.stderr):
+    """Run each test-case in `test_cases` (a Sequence of `TestCase`).
 
-    print("All tests passed: {n} of {n}".format(n=len(test_cases)))
+    At the end, return the number of tests that passed.
+    """
+    for test_idx, test_case in enumerate(test_cases):
+        _run_test(test_idx, test_case,
+                info_stream=info_stream,
+                error_stream=error_stream)
+
+    num_tests_passed = len(test_cases)
+    if info_stream is not None:
+        print("All tests passed: {n} of {n}".format(n=num_tests_passed),
+                file=info_stream)
+
+    return num_tests_passed
 
 
 class ExpectedReturn:
@@ -120,17 +131,19 @@ def get_random_int():
     return random.randint(-1000, 1000)
 
 
-def _run_test(test_idx: int, test_case: TestCase):
+def _run_test(test_idx: int, test_case: TestCase, *,
+        info_stream, error_stream):
     """Run a single test-case `test_case` (at test-index `test_idx`).
 
     If the test fails (by raising or returning anything unexpected/incorrect),
     the function `_complain_test_failure` will be called to report the failure.
     """
-    test_summary = "[{idx}] {t.descr}".format(idx=test_idx, t=test_case)
     expected = test_case.expected
-    if isinstance(expected, ExpectedException):
-        test_summary += " (expect exception)"
-    print(test_summary)
+    if info_stream is not None:
+        test_summary = "[{idx}] {t.descr}".format(idx=test_idx, t=test_case)
+        if isinstance(expected, ExpectedException):
+            test_summary += " (expect exception)"
+        print(test_summary, file=info_stream)
 
     try:
         return_val = test_case.func(*test_case.pos_args, **test_case.kwd_args)
@@ -144,7 +157,8 @@ def _run_test(test_idx: int, test_case: TestCase):
                     extra_info=dict(
                             expected=repr(expected),
                             returned=repr(return_val),
-                    )
+                    ),
+                    error_stream=error_stream
             )
 
         # OK, we *were* expecting a return-value rather than an exception.
@@ -179,7 +193,8 @@ def _run_test(test_idx: int, test_case: TestCase):
                     extra_info=dict(
                             expected=expected_return_val,
                             returned=return_val,
-                    )
+                    ),
+                    error_stream=error_stream
             )
 
     except Exception as e:
@@ -191,7 +206,8 @@ def _run_test(test_idx: int, test_case: TestCase):
                     extra_info=dict(
                             expected=repr(expected),
                             raised=repr(e),
-                    )
+                    ),
+                    error_stream=error_stream
             )
 
         # OK, we *were* expecting an exception rather than a return-value.
@@ -204,7 +220,8 @@ def _run_test(test_idx: int, test_case: TestCase):
                             expected_ex_type=expected.ex_type,
                             raised_ex_type=type(e),
                             raised_ex_repr=repr(e),
-                    )
+                    ),
+                    error_stream=error_stream
             )
 
         # If we got to here, the exception type that was raised, was expected.
@@ -222,7 +239,8 @@ def _run_test(test_idx: int, test_case: TestCase):
                     extra_info=dict(
                             expected_ex_repr=expected_ex_repr,
                             raised_ex_repr=repr(e),
-                    )
+                    ),
+                    error_stream=error_stream
             )
 
         expected_ex_str = expected.ex_str
@@ -237,12 +255,13 @@ def _run_test(test_idx: int, test_case: TestCase):
                     extra_info=dict(
                             expected_ex_str=expected_ex_str,
                             raised_ex_str=str(e),
-                    )
+                    ),
+                    error_stream=error_stream
             )
 
 
 def _complain_test_failure(test_idx: int, test_case: TestCase, *,
-        complaint: str, extra_info={}):
+        complaint: str, extra_info={}, error_stream=sys.stderr):
     """Complain about the failure of test-case `test_case`.
 
     State the complaint in `complaint`; provide any extra info in `extra_info`.
@@ -255,14 +274,15 @@ def _complain_test_failure(test_idx: int, test_case: TestCase, *,
     if extra_info:
         msg = "%sExtra info: %s\n" % (msg, extra_info)
 
-    _die(msg)
+    _die(msg, error_stream=error_stream)
 
 
-def _die(msg: str, *, exit_status=-1):
+def _die(msg: str, *, error_stream=sys.stderr, exit_status=-1):
     """Print supplied message `msg` and terminate the test-script process.
 
     Just like the `die` function in Perl.
     """
-    print("%s\nTests aborted." % msg, file=sys.stderr)
+    if error_stream is not None:
+        print("%s\nTests aborted." % msg, file=error_stream)
     sys.exit(exit_status)
 
