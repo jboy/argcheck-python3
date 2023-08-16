@@ -231,9 +231,9 @@ def _run_test(test_idx: int, test_case: TestCase, *,
         # Now we check the error message, to verify that it's complaining about
         # the expected problem.
         expected_ex_repr = expected.ex_repr
-        if "{TestCase." in expected_ex_repr:
+        if "{tc." in expected_ex_repr or "{ex." in expected_ex_repr:
             # It's a format string!
-            expected_ex_repr = expected_ex_repr.format(TestCase=test_case)
+            expected_ex_repr = expected_ex_repr.format(tc=test_case, ex=e)
 
         if expected_ex_repr != repr(e):
             # Uh-oh... wrong error message.
@@ -247,9 +247,9 @@ def _run_test(test_idx: int, test_case: TestCase, *,
             )
 
         expected_ex_str = expected.ex_str
-        if "{TestCase." in expected_ex_str:
+        if "{tc." in expected_ex_str or "{ex." in expected_ex_str:
             # It's a format string!
-            expected_ex_str = expected_ex_str.format(TestCase=test_case)
+            expected_ex_str = expected_ex_str.format(tc=test_case, ex=e)
 
         if expected_ex_str != str(e):
             # Uh-oh... wrong error message.

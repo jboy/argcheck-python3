@@ -120,6 +120,22 @@ def deco_1_params_annot_int_dflt_str(p: int = "hello"):
     return p
 
 
+class MyClass:
+    """A simple non-builtin type."""
+    def __init__(self, x):
+        self.x = x
+
+    def __repr__(self):
+        return "{self.__class__.__name__}({self.x!r})".format(self=self)
+
+    def __str__(self):
+        return "{self.x!r}".format(self=self)
+
+@ac.validate_call
+def deco_1_params_annot_MyClass(p: MyClass):
+    return p
+
+
 _TEST_CASES = [
     # TestCase(description,
     TestCase("normal Python (no @validate_call): 0 params, no annots",
@@ -149,24 +165,24 @@ _TEST_CASES = [
             no_deco_2_params_no_annots,
             (get_random_int(),), {},
             ExpectedException(TypeError,
-                    'TypeError("{TestCase.func.__name__}() missing 1 required positional argument: \'p_2\'",)',
-                    "{TestCase.func.__name__}() missing 1 required positional argument: 'p_2'"),
+                    'TypeError("{tc.func.__name__}() missing 1 required positional argument: \'p_2\'",)',
+                    "{tc.func.__name__}() missing 1 required positional argument: 'p_2'"),
     ),
 
     TestCase("normal Python (no @validate_call): too many pos-args",
             no_deco_2_params_no_annots,
             (get_random_int(), get_random_int(), get_random_int(),), {},
             ExpectedException(TypeError,
-                    "TypeError('{TestCase.func.__name__}() takes 2 positional arguments but 3 were given',)",
-                    '{TestCase.func.__name__}() takes 2 positional arguments but 3 were given'),
+                    "TypeError('{tc.func.__name__}() takes 2 positional arguments but 3 were given',)",
+                    '{tc.func.__name__}() takes 2 positional arguments but 3 were given'),
     ),
 
     TestCase("normal Python (no @validate_call): undeclared kwd-arg",
             no_deco_1_params_no_annots,
             (get_random_int(),), dict(undeclared_kwd=get_random_int(),),
             ExpectedException(TypeError,
-                    'TypeError("{TestCase.func.__name__}() got an unexpected keyword argument \'undeclared_kwd\'",)',
-                    "{TestCase.func.__name__}() got an unexpected keyword argument 'undeclared_kwd'"),
+                    'TypeError("{tc.func.__name__}() got an unexpected keyword argument \'undeclared_kwd\'",)',
+                    "{tc.func.__name__}() got an unexpected keyword argument 'undeclared_kwd'"),
     ),
 
     TestCase("@validate_call: 0 params, no annots",
@@ -227,8 +243,8 @@ _TEST_CASES = [
             deco_2_params_annot_1_int,
             ("hello", get_random_int(),), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
-                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='p_1'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
-                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p_1' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p_1'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p_1' (declared=int; received=str): _FuncCallArg(idx_or_kwd=0, val='hello')"),
     ),
 
     TestCase("@validate_call: annot params(:, :int), args(:int, :int)",
@@ -241,8 +257,8 @@ _TEST_CASES = [
             deco_2_params_annot_2_int,
             (get_random_int(), "hello",), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
-                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=1, param_name='p_2'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=1, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
-                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [1]='p_2' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=1, arg_val='hello')"),
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=1, name='p_2'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=1, val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [1]='p_2' (declared=int; received=str): _FuncCallArg(idx_or_kwd=1, val='hello')"),
     ),
 
     TestCase("@validate_call: annot params(:, :int), args(:str, :int)",
@@ -267,8 +283,8 @@ _TEST_CASES = [
             deco_1_params_annot_int_dflt_int,
             ("hello",), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
-                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='p'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
-                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(idx_or_kwd=0, val='hello')"),
     ),
 
     TestCase("@validate_call: annot params(:int = :str), args(:int)",
@@ -281,16 +297,30 @@ _TEST_CASES = [
             deco_1_params_annot_int_dflt_str,
             (), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
-                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='p'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
-                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(idx_or_kwd=0, val='hello')"),
     ),
 
     TestCase("@validate_call: annot params(:int = :str), args(:str)",
             deco_1_params_annot_int_dflt_str,
             ("there",), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
-                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='p'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='there'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
-                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='there')"),
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val='there'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(idx_or_kwd=0, val='there')"),
+    ),
+
+    TestCase("@validate_call: annot params(:MyClass), args(:MyClass)",
+            deco_1_params_annot_MyClass,
+            (MyClass(get_random_int()),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: annot params(:MyClass), args(:int)",
+            deco_1_params_annot_MyClass,
+            (get_random_int(),), {},
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val}), check_that_failed=isTypeEqualTo(type_declared=MyClass), type_declared=MyClass, type_received=int)",
+                    "violation of type check `isTypeEqualTo(type_declared=MyClass)` for param [0]='p' (declared=MyClass; received=int): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val})"),
     ),
 
 ]
