@@ -232,10 +232,12 @@ _TEST_CASES = [
             ExpectedReturn(arg_idx_or_kwd=None, expected_value=33),
     ),
 
-    TestCase("@validate_call: 1 params, (param: int = 33), args(str)",
+    TestCase("@validate_call: 1 params, (param: int = 33), args(str) (expect exception)",
             deco_1_params_annot_int_dflt_int,
             ("hello",), {},
-            ExpectedReturn(arg_idx_or_kwd=None, expected_value=33),
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='param'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='param' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
     ),
 
 ]
