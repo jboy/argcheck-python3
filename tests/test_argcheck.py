@@ -49,12 +49,12 @@ def no_deco_0_params_no_annots():
     return None
 
 
-def no_deco_1_params_no_annots(param):
-    return param
+def no_deco_1_params_no_annots(p):
+    return p
 
 
-def no_deco_2_params_no_annots(param_1, param_2):
-    return param_1
+def no_deco_2_params_no_annots(p_1, p_2):
+    return p_1
 
 
 @ac.validate_call
@@ -63,38 +63,38 @@ def deco_0_params_no_annots():
 
 
 @ac.validate_call
-def deco_1_params_no_annots(param):
-    return param
+def deco_1_params_no_annots(p):
+    return p
 
 
 @ac.validate_call
-def deco_2_params_no_annots(param_1, param_2):
-    return param_1
+def deco_2_params_no_annots(p_1, p_2):
+    return p_1
 
 
 @ac.validate_call
-def deco_2_params_annot_1_int(param_1: int, param_2):
-    return param_1
+def deco_2_params_annot_1_int(p_1: int, p_2):
+    return p_1
 
 
 @ac.validate_call
-def deco_2_params_annot_2_int(param_1, param_2: int):
-    return param_1
+def deco_2_params_annot_2_int(p_1, p_2: int):
+    return p_1
 
 
 @ac.validate_call
-def deco_1_params_annot_int_dflt_int(param: int = 33):
-    return param
+def deco_1_params_annot_int_dflt_int(p: int = 33):
+    return p
 
 
 @ac.validate_call
-def deco_1_params_annot_int_dflt_str(param: int = "hello"):
-    return param
+def deco_1_params_annot_int_dflt_str(p: int = "hello"):
+    return p
 
 
 _TEST_CASES = [
     # TestCase(description,
-    TestCase("no decorator: 0 params, no annots, 0 pos-args",
+    TestCase("normal Python (no @validate_call): 0 params, no annots",
             # function to call,
             no_deco_0_params_no_annots,
             # function positional arguments (a tuple),
@@ -105,27 +105,27 @@ _TEST_CASES = [
             ExpectedReturn(arg_idx_or_kwd=None, expected_value=None),
     ),
 
-    TestCase("no decorator: 1 params, no annots, 1 pos-args",
+    TestCase("normal Python (no @validate_call): 1 params, no annots",
             no_deco_1_params_no_annots,
             (get_random_int(),), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("no decorator: 2 params, no annots, 2 pos-args",
+    TestCase("normal Python (no @validate_call): 2 params, no annots",
             no_deco_2_params_no_annots,
             (get_random_int(), get_random_int(),), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("no decorator: 2 params, no annots, too few pos-args",
+    TestCase("normal Python (no @validate_call): too few pos-args",
             no_deco_2_params_no_annots,
             (get_random_int(),), {},
             ExpectedException(TypeError,
-                    'TypeError("{TestCase.func.__name__}() missing 1 required positional argument: \'param_2\'",)',
-                    "{TestCase.func.__name__}() missing 1 required positional argument: 'param_2'"),
+                    'TypeError("{TestCase.func.__name__}() missing 1 required positional argument: \'p_2\'",)',
+                    "{TestCase.func.__name__}() missing 1 required positional argument: 'p_2'"),
     ),
 
-    TestCase("no decorator: 2 params, no annots, too many pos-args",
+    TestCase("normal Python (no @validate_call): too many pos-args",
             no_deco_2_params_no_annots,
             (get_random_int(), get_random_int(), get_random_int(),), {},
             ExpectedException(TypeError,
@@ -133,7 +133,7 @@ _TEST_CASES = [
                     '{TestCase.func.__name__}() takes 2 positional arguments but 3 were given'),
     ),
 
-    TestCase("no decorator: 1 params, no annots, undeclared kwd-arg",
+    TestCase("normal Python (no @validate_call): undeclared kwd-arg",
             no_deco_1_params_no_annots,
             (get_random_int(),), dict(undeclared_kwd=get_random_int(),),
             ExpectedException(TypeError,
@@ -141,33 +141,33 @@ _TEST_CASES = [
                     "{TestCase.func.__name__}() got an unexpected keyword argument 'undeclared_kwd'"),
     ),
 
-    TestCase("@validate_call: 0 params, no annots, 0 pos-args",
+    TestCase("@validate_call: 0 params, no annots",
             deco_0_params_no_annots,
             (), {},
             ExpectedReturn(arg_idx_or_kwd=None, expected_value=None),
     ),
 
-    TestCase("@validate_call: 1 params, no annots, 1 pos-args",
+    TestCase("@validate_call: 1 params, no annots",
             deco_1_params_no_annots,
             (get_random_int(),), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 2 params, no annots, 2 pos-args",
+    TestCase("@validate_call: 2 params, no annots",
             deco_2_params_no_annots,
             (get_random_int(), get_random_int(),), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 2 params, no annots, too few pos-args",
+    TestCase("@validate_call: too few pos-args",
             deco_2_params_no_annots,
             (get_random_int(),), {},
             ExpectedException(ac.exceptions.CallArgBindingRejection,
-                    'CallArgBindingRejection(exception_args=("missing a required argument: \'param_2\'",))',
-                    'unable to bind function call argument: "missing a required argument: \'param_2\'"'),
+                    'CallArgBindingRejection(exception_args=("missing a required argument: \'p_2\'",))',
+                    'unable to bind function call argument: "missing a required argument: \'p_2\'"'),
     ),
 
-    TestCase("@validate_call: 2 params, no annots, too many pos-args",
+    TestCase("@validate_call: too many pos-args",
             deco_2_params_no_annots,
             (get_random_int(), get_random_int(), get_random_int(),), {},
             ExpectedException(ac.exceptions.CallArgBindingRejection,
@@ -175,7 +175,7 @@ _TEST_CASES = [
                     "unable to bind function call argument: 'too many positional arguments'"),
     ),
 
-    TestCase("@validate_call: 1 params, no annots, undeclared kwd-arg",
+    TestCase("@validate_call: undeclared kwd-arg",
             deco_1_params_no_annots,
             (get_random_int(),), dict(undeclared_kwd=get_random_int(),),
             ExpectedException(ac.exceptions.CallArgBindingRejection,
@@ -183,64 +183,64 @@ _TEST_CASES = [
                     'unable to bind function call argument: "got an unexpected keyword argument \'undeclared_kwd\'"'),
     ),
 
-    TestCase("@validate_call: 2 params, (param_1: int), args(int, int)",
+    TestCase("@validate_call: params(p_1: int, p_2), args(int, int)",
             deco_2_params_annot_1_int,
             (get_random_int(), get_random_int(),), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 2 params, (param_1: int), args(int, str)",
+    TestCase("@validate_call: params(p_1: int, p_2), args(int, str)",
             deco_2_params_annot_1_int,
             (get_random_int(), "hello",), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 2 params, (param_1: int), args(str, int)",
+    TestCase("@validate_call: params(p_1: int, p_2), args(str, int)",
             deco_2_params_annot_1_int,
             ("hello", get_random_int(),), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
-                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='param_1'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
-                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='param_1' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='p_1'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p_1' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
     ),
 
-    TestCase("@validate_call: 2 params, (param_2: int), args(int, int)",
+    TestCase("@validate_call: params(p_1, p_2: int), args(int, int)",
             deco_2_params_annot_2_int,
             (get_random_int(), get_random_int(),), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 2 params, (param_2: int), args(int, str)",
+    TestCase("@validate_call: params(p_1, p_2: int), args(int, str)",
             deco_2_params_annot_2_int,
             (get_random_int(), "hello",), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
-                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=1, param_name='param_2'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=1, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
-                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [1]='param_2' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=1, arg_val='hello')"),
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=1, param_name='p_2'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=1, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [1]='p_2' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=1, arg_val='hello')"),
     ),
 
-    TestCase("@validate_call: 2 params, (param_2: int), args(str, int)",
+    TestCase("@validate_call: params(p_1, p_2: int), args(str, int)",
             deco_2_params_annot_2_int,
             ("hello", get_random_int(),), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 1 params, (param: int = 33), args(int)",
+    TestCase("@validate_call: params(p: int = 33), args(int)",
             deco_1_params_annot_int_dflt_int,
             (get_random_int(),), {},
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 1 params, (param: int = 33), args()",
+    TestCase("@validate_call: params(p: int = 33), args()",
             deco_1_params_annot_int_dflt_int,
             (), {},
             ExpectedReturn(arg_idx_or_kwd=None, expected_value=33),
     ),
 
-    TestCase("@validate_call: 1 params, (param: int = 33), args(str)",
+    TestCase("@validate_call: params(p: int = 33), args(str)",
             deco_1_params_annot_int_dflt_int,
             ("hello",), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
-                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='param'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
-                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='param' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(param_idx=0, param_name='p'), arg_that_caused_failure=_FuncCallArg(arg_idx_or_kwd=0, arg_val='hello'), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=str)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=str): _FuncCallArg(arg_idx_or_kwd=0, arg_val='hello')"),
     ),
 
 ]
