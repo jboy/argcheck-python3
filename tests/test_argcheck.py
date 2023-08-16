@@ -40,6 +40,9 @@ import argcheck as ac
 # to be invoked and *tested* by the test-cases.
 #
 # Each of these functions may be called by any number of test-cases.
+#
+# The names of these functions also have no significance
+# (other than to be unique and vaguely-descriptive).
 
 
 def no_deco_0_params_no_annots():
@@ -244,4 +247,4 @@ _TEST_CASES = [
 
 
 if __name__ == "__main__":
-    run_all_tests(_TEST_CASES)
+    run_all_tests(_TEST_CASES, verbose_info=True)

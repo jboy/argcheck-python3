@@ -23,7 +23,8 @@ class TestCase:
 
 
 def run_all_tests(test_cases: Sequence[TestCase], *,
-        info_stream=sys.stdout, error_stream=sys.stderr):
+        info_stream=sys.stdout, error_stream=sys.stderr,
+        verbose_info=False):
     """Run each test-case in `test_cases` (a Sequence of `TestCase`).
 
     At the end, return the number of tests that passed.
@@ -31,7 +32,8 @@ def run_all_tests(test_cases: Sequence[TestCase], *,
     for test_idx, test_case in enumerate(test_cases):
         _run_test(test_idx, test_case,
                 info_stream=info_stream,
-                error_stream=error_stream)
+                error_stream=error_stream,
+                verbose_info=verbose_info)
 
     num_tests_passed = len(test_cases)
     if info_stream is not None:
@@ -132,7 +134,7 @@ def get_random_int():
 
 
 def _run_test(test_idx: int, test_case: TestCase, *,
-        info_stream, error_stream):
+        info_stream, error_stream, verbose_info=False):
     """Run a single test-case `test_case` (at test-index `test_idx`).
 
     If the test fails (by raising or returning anything unexpected/incorrect),
@@ -144,6 +146,11 @@ def _run_test(test_idx: int, test_case: TestCase, *,
         if isinstance(expected, ExpectedException):
             test_summary += " (expect exception)"
         print(test_summary, file=info_stream)
+
+        if verbose_info:
+            print("Function: {t.func.__name__}\nPos-args: {t.pos_args}\nKwd-args: {t.kwd_args}\nExpected: {t.expected}\n".format(
+                    t=test_case),
+                    file=info_stream)
 
     try:
         return_val = test_case.func(*test_case.pos_args, **test_case.kwd_args)
@@ -268,7 +275,7 @@ def _complain_test_failure(test_idx: int, test_case: TestCase, *,
 
     At the end of this function, `_die` will be called to terminate the process.
     """
-    msg = "\n{t.__class__.__name__}[{idx}] failed: \"{t.descr}\"\n\nFunction: {t.func.__name__}\nPos args: {t.pos_args}\nKwd args: {t.kwd_args}\nExpected: {t.expected}\n\nComplaint: {complaint}\n".format(
+    msg = "\n{t.__class__.__name__}[{idx}] failed: \"{t.descr}\"\n\nFunction: {t.func.__name__}\nPos-args: {t.pos_args}\nKwd-args: {t.kwd_args}\nExpected: {t.expected}\n\nComplaint: {complaint}\n".format(
             t=test_case, idx=test_idx, complaint=complaint)
 
     if extra_info:
