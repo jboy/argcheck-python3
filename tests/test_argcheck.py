@@ -19,7 +19,7 @@
 import os
 import sys
 
-from utils_for_tests import (TestCase, ExpectedReturn, ExpectedException,
+from _testing_framework import (TestCase, ExpectedReturn, ExpectedException,
         get_random_int)
 
 # Yay for Python relative imports.  A very popular topic on Stack Overflow!
