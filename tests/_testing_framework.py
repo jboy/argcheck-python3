@@ -126,14 +126,18 @@ def _run_test(test_idx: int, test_case: TestCase):
     If the test fails (by raising or returning anything unexpected/incorrect),
     the function `_complain_test_failure` will be called to report the failure.
     """
-    print("[%d] %s" % (test_idx, test_case.descr))
+    test_summary = "[{idx}] {t.descr}".format(idx=test_idx, t=test_case)
+    expected = test_case.expected
+    if isinstance(expected, ExpectedException):
+        test_summary += " (expect exception)"
+    print(test_summary)
+
     try:
         return_val = test_case.func(*test_case.pos_args, **test_case.kwd_args)
 
         # No exception was raised.
         # Did we *expect* that no exception was raised?
         # To put it another way:  Did we expect a return-value or an exception?
-        expected = test_case.expected
         if not isinstance(expected, ExpectedReturn):
             _complain_test_failure(test_idx, test_case,
                     complaint="unexpected return value",
@@ -181,7 +185,6 @@ def _run_test(test_idx: int, test_case: TestCase):
     except Exception as e:
         # An exception was raised.
         # Did we *expect* that an exception would be raised?
-        expected = test_case.expected
         if not isinstance(expected, ExpectedException):
             _complain_test_failure(test_idx, test_case,
                     complaint="unexpected exception raised",

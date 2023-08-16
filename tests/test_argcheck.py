@@ -114,7 +114,7 @@ _TEST_CASES = [
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("no decorator: 2 params, no annots, too few pos-args (expect exception)",
+    TestCase("no decorator: 2 params, no annots, too few pos-args",
             no_deco_2_params_no_annots,
             (get_random_int(),), {},
             ExpectedException(TypeError,
@@ -122,7 +122,7 @@ _TEST_CASES = [
                     "{TestCase.func.__name__}() missing 1 required positional argument: 'param_2'"),
     ),
 
-    TestCase("no decorator: 2 params, no annots, too many pos-args (expect exception)",
+    TestCase("no decorator: 2 params, no annots, too many pos-args",
             no_deco_2_params_no_annots,
             (get_random_int(), get_random_int(), get_random_int(),), {},
             ExpectedException(TypeError,
@@ -130,7 +130,7 @@ _TEST_CASES = [
                     '{TestCase.func.__name__}() takes 2 positional arguments but 3 were given'),
     ),
 
-    TestCase("no decorator: 1 params, no annots, undeclared kwd-arg (expect exception)",
+    TestCase("no decorator: 1 params, no annots, undeclared kwd-arg",
             no_deco_1_params_no_annots,
             (get_random_int(),), dict(undeclared_kwd=get_random_int(),),
             ExpectedException(TypeError,
@@ -156,7 +156,7 @@ _TEST_CASES = [
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 2 params, no annots, too few pos-args (expect exception)",
+    TestCase("@validate_call: 2 params, no annots, too few pos-args",
             deco_2_params_no_annots,
             (get_random_int(),), {},
             ExpectedException(ac.exceptions.CallArgBindingRejection,
@@ -164,7 +164,7 @@ _TEST_CASES = [
                     'unable to bind function call argument: "missing a required argument: \'param_2\'"'),
     ),
 
-    TestCase("@validate_call: 2 params, no annots, too many pos-args (expect exception)",
+    TestCase("@validate_call: 2 params, no annots, too many pos-args",
             deco_2_params_no_annots,
             (get_random_int(), get_random_int(), get_random_int(),), {},
             ExpectedException(ac.exceptions.CallArgBindingRejection,
@@ -172,7 +172,7 @@ _TEST_CASES = [
                     "unable to bind function call argument: 'too many positional arguments'"),
     ),
 
-    TestCase("@validate_call: 1 params, no annots, undeclared kwd-arg (expect exception)",
+    TestCase("@validate_call: 1 params, no annots, undeclared kwd-arg",
             deco_1_params_no_annots,
             (get_random_int(),), dict(undeclared_kwd=get_random_int(),),
             ExpectedException(ac.exceptions.CallArgBindingRejection,
@@ -192,7 +192,7 @@ _TEST_CASES = [
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 2 params, (param_1: int), args(str, int) (expect exception)",
+    TestCase("@validate_call: 2 params, (param_1: int), args(str, int)",
             deco_2_params_annot_1_int,
             ("hello", get_random_int(),), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
@@ -206,7 +206,7 @@ _TEST_CASES = [
             ExpectedReturn(arg_idx_or_kwd=0),
     ),
 
-    TestCase("@validate_call: 2 params, (param_2: int), args(int, str) (expect exception)",
+    TestCase("@validate_call: 2 params, (param_2: int), args(int, str)",
             deco_2_params_annot_2_int,
             (get_random_int(), "hello",), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
@@ -232,7 +232,7 @@ _TEST_CASES = [
             ExpectedReturn(arg_idx_or_kwd=None, expected_value=33),
     ),
 
-    TestCase("@validate_call: 1 params, (param: int = 33), args(str) (expect exception)",
+    TestCase("@validate_call: 1 params, (param: int = 33), args(str)",
             deco_1_params_annot_int_dflt_int,
             ("hello",), {},
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
