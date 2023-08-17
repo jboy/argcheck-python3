@@ -142,6 +142,11 @@ def get_random_int():
     return randint(-1000, 1000)
 
 
+def get_random_positive_int():
+    """Return a random integer in the range [1, 1000]."""
+    return randint(1, 1000)
+
+
 def get_random_str(*, min_len=5, max_len=10):
     """Return a random-length string of random lowercase letters.
 

@@ -21,7 +21,8 @@ import sys
 
 from typing import Sequence
 from _testing_framework import (TestCase, ExpectedReturn, ExpectedException,
-        run_all_tests, get_random_int, get_random_str, get_random_list)
+        run_all_tests, get_random_int, get_random_positive_int, get_random_str,
+        get_random_list)
 
 # Yay for Python relative imports.  A very popular topic on Stack Overflow!
 _TEST_CASES_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -150,6 +151,11 @@ def deco_1_params_annot_Sequence(p: Sequence):
 
 @ac.validate_call
 def deco_1_params_annot_Sequence_int(p: Sequence[int]):
+    return p
+
+
+@ac.validate_call
+def deco_1_params_annot_int_isPositive(p: ac.Annotated[int, ac.isPositive]):
     return p
 
 
@@ -430,6 +436,28 @@ _TEST_CASES = [
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
                     "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=Sequence), type_declared=typing.Sequence[int], type_received=MyClass)",
                     "violation of type check `isTypeEqualTo(type_declared=Sequence)` for param [0]='p' (declared=typing.Sequence[int]; received=MyClass): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:int>0), args(:int>0)",
+            deco_1_params_annot_int_isPositive,
+            (get_random_positive_int(),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: annot params(:int>0), args(:int==0)",
+            deco_1_params_annot_int_isPositive,
+            (0,), {},
+            ExpectedException(ac.exceptions.CallArgValueCheckViolation,
+                    "CallArgValueCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isPositive())",
+                    "violation of value-constraint check `isPositive()` for param [0]='p': _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:int>0), args(:int<0)",
+            deco_1_params_annot_int_isPositive,
+            (-get_random_positive_int(),), {},
+            ExpectedException(ac.exceptions.CallArgValueCheckViolation,
+                    "CallArgValueCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isPositive())",
+                    "violation of value-constraint check `isPositive()` for param [0]='p': _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
     ),
 
 ]
