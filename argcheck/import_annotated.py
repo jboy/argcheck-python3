@@ -1,4 +1,7 @@
-"""A simple, minimalist stand-in for ``typing.Annotated`` for Python < 3.9."""
+"""A simple, minimalist stand-in for ``typing.Annotated`` for Python < 3.9.
+
+Project repo with LICENSE and tests: https://github.com/jboy/argcheck-python3
+"""
 
 try:
     # The following import will fail if you're running Python < 3.9:

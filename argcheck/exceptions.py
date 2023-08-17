@@ -88,6 +88,8 @@ This is the current exception hierarchy:
 Aside: In this module (and in fact, in this whole ``argcheck`` package), when
 we talk about "parameters" (frequently shortened to ``Param``), we are talking
 about **function parameters** rather than **neural-network parameters**.
+
+Project repo with LICENSE and tests: https://github.com/jboy/argcheck-python3
 """
 
 import inspect as _inspect

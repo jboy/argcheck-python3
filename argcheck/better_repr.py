@@ -74,6 +74,8 @@ As another example:
     'typing.Sequence<+T_co>[typing.Sequence<+T_co>[int]]'
 
 We would prefer that `repr(Sequence[int])` returns `"Sequence[int]"`.
+
+Project repo with LICENSE and tests: https://github.com/jboy/argcheck-python3
 """
 
 

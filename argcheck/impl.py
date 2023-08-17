@@ -1,4 +1,7 @@
-"""The main implementation of the function argument checking."""
+"""The main implementation of the function argument checking.
+
+Project repo with LICENSE and tests: https://github.com/jboy/argcheck-python3
+"""
 
 import functools
 

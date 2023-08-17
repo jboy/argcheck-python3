@@ -1,4 +1,7 @@
-"""A catalogue of classes for function argument checks."""
+"""A catalogue of classes for function argument checks.
+
+Project repo with LICENSE and tests: https://github.com/jboy/argcheck-python3
+"""
 
 import inspect as _inspect
 
