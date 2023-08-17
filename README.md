@@ -21,6 +21,7 @@ Example usage
 
 ```python
 import argcheck as ac
+from typing import Sequence
 
 @ac.validate_call
 def construct_conv_net(
