@@ -22,7 +22,7 @@ import sys
 from typing import Sequence
 from _testing_framework import (TestCase, ExpectedReturn, ExpectedException,
         run_all_tests, get_random_int, get_random_positive_int, get_random_str,
-        get_random_list)
+        get_random_list, YieldIncrInt)
 
 # Yay for Python relative imports.  A very popular topic on Stack Overflow!
 _TEST_CASES_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -157,6 +157,18 @@ def deco_1_params_annot_Sequence_int(p: Sequence[int]):
 @ac.validate_call
 def deco_1_params_annot_int_isPositive(p: ac.Annotated[int, ac.isPositive]):
     return p
+
+
+@ac.validate_call
+def construct_conv_net(
+        in_channels: ac.Annotated[int, ac.isPositive] = 3,
+        out_channels: ac.Annotated[int, ac.isPositive] = 1,
+        num_features_per_scale: ac.Annotated[
+                Sequence[int],
+                [ac.isNotEmpty, ac.isMonotonicIncr, ac.eachAll(ac.isPositive)]
+        ] = [64, 128, 256, 512],
+    ):
+    return in_channels
 
 
 _TEST_CASES = [
@@ -458,6 +470,81 @@ _TEST_CASES = [
             ExpectedException(ac.exceptions.CallArgValueCheckViolation,
                     "CallArgValueCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isPositive())",
                     "violation of value-constraint check `isPositive()` for param [0]='p': _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: func `construct_conv_net`, all default args",
+            construct_conv_net,
+            (), {},
+            ExpectedReturn(arg_idx_or_kwd=None, expected_value=3),
+    ),
+
+    TestCase("@validate_call: func `construct_conv_net`, all valid args (incr by 1)",
+            construct_conv_net,
+            (get_random_positive_int(), get_random_positive_int(),
+                    get_random_list(
+                            YieldIncrInt(
+                                    start=get_random_positive_int()))),
+            {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: func `construct_conv_net`, all valid args (incr random)",
+            construct_conv_net,
+            (get_random_positive_int(), get_random_positive_int(),
+                    get_random_list(
+                            YieldIncrInt(
+                                    start=get_random_positive_int(),
+                                    incr_func=get_random_positive_int))),
+            {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: func `construct_conv_net`, empty list",
+            construct_conv_net,
+            (get_random_positive_int(), get_random_positive_int(), []), {},
+            ExpectedException(ac.exceptions.CallArgValueCheckViolation,
+                    "CallArgValueCheckViolation(param=_DeclFuncParam(idx=2, name='num_features_per_scale'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=2, val=[]), check_that_failed=isNotEmpty())",
+                    "violation of value-constraint check `isNotEmpty()` for param [2]='num_features_per_scale': _FuncCallArg(idx_or_kwd=2, val=[])"),
+    ),
+
+    TestCase("@validate_call: func `construct_conv_net`, list of a single 0",
+            construct_conv_net,
+            (get_random_positive_int(), get_random_positive_int(), [0]), {},
+            ExpectedException(ac.exceptions.CallArgEachCheckViolation,
+                    "CallArgEachCheckViolation(param=_DeclFuncParam(idx=2, name='num_features_per_scale'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=2, val={ex.arg_that_caused_failure.val!r}), check_that_failed=eachAll(check_applied_to_each=isPositive()), idx_within_sequence=0, value_within_sequence={ex.value_within_sequence!r})",
+                    "violation of sequence check `eachAll(check_applied_to_each=isPositive())` for param [2]='num_features_per_scale': _FuncCallArg(idx_or_kwd=2, val={ex.arg_that_caused_failure.val!r}) (at sequence element [0]={ex.value_within_sequence!r})"),
+    ),
+
+    TestCase("@validate_call: func `construct_conv_net`, list of multiple 0s",
+            construct_conv_net,
+            (get_random_positive_int(), get_random_positive_int(),
+                    get_random_list(int, min_len=2, max_len=8)),
+            {},
+            ExpectedException(ac.exceptions.CallArgValueCheckViolation,
+                    "CallArgValueCheckViolation(param=_DeclFuncParam(idx=2, name='num_features_per_scale'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=2, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isMonotonicIncr())",
+                    "violation of value-constraint check `isMonotonicIncr()` for param [2]='num_features_per_scale': _FuncCallArg(idx_or_kwd=2, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: func `construct_conv_net`, list of a single -1",
+            construct_conv_net,
+            (get_random_positive_int(), get_random_positive_int(), [-1]), {},
+            ExpectedException(ac.exceptions.CallArgEachCheckViolation,
+                    "CallArgEachCheckViolation(param=_DeclFuncParam(idx=2, name='num_features_per_scale'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=2, val={ex.arg_that_caused_failure.val!r}), check_that_failed=eachAll(check_applied_to_each=isPositive()), idx_within_sequence=0, value_within_sequence={ex.value_within_sequence!r})",
+                    "violation of sequence check `eachAll(check_applied_to_each=isPositive())` for param [2]='num_features_per_scale': _FuncCallArg(idx_or_kwd=2, val={ex.arg_that_caused_failure.val!r}) (at sequence element [0]={ex.value_within_sequence!r})"),
+    ),
+
+    TestCase("@validate_call: func `construct_conv_net`, positive ints (incr by -1)",
+            construct_conv_net,
+            (get_random_positive_int(), get_random_positive_int(),
+                    get_random_list(
+                            YieldIncrInt(
+                                    start=(10 + get_random_positive_int()),
+                                    incr_func=(lambda: -1)),
+                            min_len=2, max_len=8)),
+            {},
+            ExpectedException(ac.exceptions.CallArgValueCheckViolation,
+                    "CallArgValueCheckViolation(param=_DeclFuncParam(idx=2, name='num_features_per_scale'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=2, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isMonotonicIncr())",
+                    "violation of value-constraint check `isMonotonicIncr()` for param [2]='num_features_per_scale': _FuncCallArg(idx_or_kwd=2, val={ex.arg_that_caused_failure.val!r})"),
     ),
 
 ]

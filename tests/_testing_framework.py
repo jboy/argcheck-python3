@@ -182,6 +182,23 @@ def get_random_list(elem_ctor_func,
             for i in range(randint(min_len, max_len))]
 
 
+class YieldIncrInt:
+    """Yield an `int` value that increments with each successive call.
+
+    The first value returned can be specified by `start`.
+
+    The amount by which the value increments can be specified by `incr_func`.
+    """
+    def __init__(self, *, start=0, incr_func=(lambda: 1)):
+        self.curr_val = start
+        self.incr_func = incr_func
+
+    def __call__(self):
+        curr_val = self.curr_val
+        self.curr_val += self.incr_func()
+        return curr_val
+
+
 def _run_test(test_idx: int, test_case: TestCase, *,
         info_stream, error_stream, verbose_info=False):
     """Run a single test-case `test_case` (at test-index `test_idx`).
