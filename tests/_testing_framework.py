@@ -1,7 +1,8 @@
-import random
 import sys
 
 from inspect import signature
+from random import randint
+from string import ascii_lowercase
 from typing import Sequence
 
 
@@ -138,7 +139,23 @@ class ExpectedException:
 
 def get_random_int():
     """Return a random integer in the range [-1000, 1000]."""
-    return random.randint(-1000, 1000)
+    return randint(-1000, 1000)
+
+
+def get_random_str(*, min_len=5, max_len=10):
+    """Return a random string of lowercase letters with length in range [5, 10].
+
+    The string-length arguments to this function specify a closed-closed range:
+    `(min_len, max_len)`
+
+    This is intentionally similar to the arguments to function `random.randint`.
+    """
+    min_letter_idx = 0
+    max_letter_idx = len(ascii_lowercase) - 1
+
+    return "".join(
+            ascii_lowercase[randint(min_letter_idx, max_letter_idx)]
+            for i in range(randint(min_len, max_len)))
 
 
 def _run_test(test_idx: int, test_case: TestCase, *,
