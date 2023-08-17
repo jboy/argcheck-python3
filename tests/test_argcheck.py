@@ -131,8 +131,14 @@ class MyClass:
     def __str__(self):
         return "{self.x!r}".format(self=self)
 
+
 @ac.validate_call
 def deco_1_params_annot_MyClass(p: MyClass):
+    return p
+
+
+@ac.validate_call
+def deco_1_params_annot_int(p: int):
     return p
 
 
@@ -321,6 +327,20 @@ _TEST_CASES = [
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
                     "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=MyClass), type_declared=MyClass, type_received=int)",
                     "violation of type check `isTypeEqualTo(type_declared=MyClass)` for param [0]='p' (declared=MyClass; received=int): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:int), args(:int)",
+            deco_1_params_annot_int,
+            (get_random_int(),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: annot params(:int), args(:MyClass)",
+            deco_1_params_annot_int,
+            (MyClass(get_random_int()),), {},
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=MyClass)",
+                    "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=MyClass): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
     ),
 
 ]

@@ -39,7 +39,7 @@ def run_all_tests(test_cases: Sequence[TestCase], *,
 
     num_tests_passed = len(test_cases)
     if info_stream is not None:
-        print("All tests passed: {n} of {n}".format(n=num_tests_passed),
+        print("\nAll tests passed: {n} of {n}".format(n=num_tests_passed),
                 file=info_stream)
 
     return num_tests_passed
@@ -170,12 +170,13 @@ def _run_test(test_idx: int, test_case: TestCase, *,
         test_summary = "[{idx}] {t.descr}".format(idx=test_idx, t=test_case)
         if isinstance(expected, ExpectedException):
             test_summary += " => expect exception"
-        print(test_summary, file=info_stream)
 
         if verbose_info:
-            print("Function: {t.func.__name__}\nFunc-sig: {sig}\nPos-args: {t.pos_args}\nKwd-args: {t.kwd_args}\nExpected: {t.expected}\n".format(
-                    t=test_case, sig=signature(test_case.func)),
+            print("\n{ts}\nFunction: {tc.func.__name__}\nFunc-sig: {sig}\nPos-args: {tc.pos_args}\nKwd-args: {tc.kwd_args}\nExpected: {tc.expected}".format(
+                    tc=test_case, ts=test_summary, sig=signature(test_case.func)),
                     file=info_stream)
+        else:
+            print(test_summary, file=info_stream)
 
     try:
         return_val = test_case.func(*test_case.pos_args, **test_case.kwd_args)
@@ -216,6 +217,10 @@ def _run_test(test_idx: int, test_case: TestCase, *,
                     ),
                     error_stream=error_stream
             )
+
+        if (info_stream is not None) and verbose_info:
+                print("Received: {rv!r}".format(rv=return_val),
+                        file=info_stream)
 
     except Exception as e:
         # An exception was raised.
@@ -278,6 +283,10 @@ def _run_test(test_idx: int, test_case: TestCase, *,
                     ),
                     error_stream=error_stream
             )
+
+        if (info_stream is not None) and verbose_info:
+                print("Received: {ex.__class__.__name__!s}".format(ex=e),
+                        file=info_stream)
 
 
 def _complain_test_failure(test_idx: int, test_case: TestCase, *,
