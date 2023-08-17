@@ -27,6 +27,15 @@ def construct_conv_net(
     # Construct a Convolutional Neural Network...
 ```
 
+Currently-implemented argument checks
+-------------------------------------
+
+- `isTypeEqualTo(specified_type)`: check the declared parameter type
+- `isNotEmpty`: verify that a container of values is NOT empty
+- `isMonotonicIncr`: verify that a sequence of values is monotonic increasing
+- `isPositive`: verify that a numeric value is positive
+- `eachAll(check)`: apply `check` to each value in a container; expect ALL true
+
 Details
 -------
 
@@ -44,24 +53,15 @@ merely inert type hint annotations that conform to PEP-484 or PEP-593.
 Arguments are only checked when the decorated function is called.
 `argcheck` does not perform any static analysis of code.
 
+If an argument check is violated when the decorated function is called,
+an exception derived from `argcheck.ArgCheckException` will be raised.
+
 `argcheck` is optimised for detailed error reporting rather than for speed
 of checking.  `argcheck` is well-suited to large, infrequently-called
 functions where it's important to validate arguments before expensive
 mistakes occur.  `argcheck` might not be well-suited to frequently-called
 functions if speed of execution is important.
 
-If an argument check is violated when the decorated function is called,
-an exception derived from `argcheck.ArgCheckException` will be raised.
-
 A function decorated by `@validate_call` will present the same signature
 as the original function, so other signature-introspection functionality
 should also still work.
-
-Currently-implemented argument checks
--------------------------------------
-
-- `isTypeEqualTo(specified_type)`: check the declared parameter type
-- `isNotEmpty`: verify that a container of values is NOT empty
-- `isMonotonicIncr`: verify that a sequence of values is monotonic increasing
-- `isPositive`: verify that a numeric value is positive
-- `eachAll(check)`: apply `check` to each value in a container; expect ALL true
