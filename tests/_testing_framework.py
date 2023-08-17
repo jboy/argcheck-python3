@@ -143,12 +143,13 @@ def get_random_int():
 
 
 def get_random_str(*, min_len=5, max_len=10):
-    """Return a random string of lowercase letters with length in range [5, 10].
+    """Return a random-length string of random lowercase letters.
 
     The string-length arguments to this function specify a closed-closed range:
-    `(min_len, max_len)`
+    `(min_len=5, max_len=10)`
 
-    This is intentionally similar to the arguments to function `random.randint`.
+    The use of a closed-closed range is intentionally similar to the arguments
+    to function `random.randint`.
     """
     min_letter_idx = 0
     max_letter_idx = len(ascii_lowercase) - 1
@@ -156,6 +157,23 @@ def get_random_str(*, min_len=5, max_len=10):
     return "".join(
             ascii_lowercase[randint(min_letter_idx, max_letter_idx)]
             for i in range(randint(min_len, max_len)))
+
+
+def get_random_list(elem_ctor_func, args_for_elem_ctors:tuple=(), *,
+        min_len=1, max_len=6):
+    """Return a random-length list of random elements.
+
+    The random elements in the list will be constructed by supplied function
+    `elem_ctor_func`, given positional arguments `args_for_elem_ctors`.
+
+    The list-length arguments to this function specify a closed-closed range:
+    `(min_len=5, max_len=10)`
+
+    The use of a closed-closed range is intentionally similar to the arguments
+    to function `random.randint`.
+    """
+    return [elem_ctor_func(*args_for_elem_ctors)
+            for i in range(randint(min_len, max_len))]
 
 
 def _run_test(test_idx: int, test_case: TestCase, *,

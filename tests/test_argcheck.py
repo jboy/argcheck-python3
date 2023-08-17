@@ -19,8 +19,9 @@
 import os
 import sys
 
+from typing import Sequence
 from _testing_framework import (TestCase, ExpectedReturn, ExpectedException,
-        run_all_tests, get_random_int, get_random_str)
+        run_all_tests, get_random_int, get_random_str, get_random_list)
 
 # Yay for Python relative imports.  A very popular topic on Stack Overflow!
 _TEST_CASES_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -139,6 +140,11 @@ def deco_1_params_annot_MyClass(p: MyClass):
 
 @ac.validate_call
 def deco_1_params_annot_int(p: int):
+    return p
+
+
+@ac.validate_call
+def deco_1_params_annot_Sequence(p: Sequence):
     return p
 
 
@@ -341,6 +347,40 @@ _TEST_CASES = [
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
                     "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=int), type_declared=int, type_received=MyClass)",
                     "violation of type check `isTypeEqualTo(type_declared=int)` for param [0]='p' (declared=int; received=MyClass): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence), args(:list)",
+            deco_1_params_annot_Sequence,
+            (get_random_list(get_random_int),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence), args(:tuple)",
+            deco_1_params_annot_Sequence,
+            (tuple(get_random_list(get_random_int)),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence), args(:str)",
+            deco_1_params_annot_Sequence,
+            (get_random_str(),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence), args(:int)",
+            deco_1_params_annot_Sequence,
+            (get_random_int(),), {},
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=Sequence), type_declared=typing.Sequence, type_received=int)",
+                    "violation of type check `isTypeEqualTo(type_declared=Sequence)` for param [0]='p' (declared=typing.Sequence; received=int): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence), args(:MyClass)",
+            deco_1_params_annot_Sequence,
+            (MyClass(get_random_int()),), {},
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=Sequence), type_declared=typing.Sequence, type_received=MyClass)",
+                    "violation of type check `isTypeEqualTo(type_declared=Sequence)` for param [0]='p' (declared=typing.Sequence; received=MyClass): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
     ),
 
 ]
