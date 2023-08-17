@@ -148,6 +148,11 @@ def deco_1_params_annot_Sequence(p: Sequence):
     return p
 
 
+@ac.validate_call
+def deco_1_params_annot_Sequence_int(p: Sequence[int]):
+    return p
+
+
 _TEST_CASES = [
     # TestCase(description,
     TestCase("normal Python (no @validate_call): 0 params, no annots",
@@ -381,6 +386,50 @@ _TEST_CASES = [
             ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
                     "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=Sequence), type_declared=typing.Sequence, type_received=MyClass)",
                     "violation of type check `isTypeEqualTo(type_declared=Sequence)` for param [0]='p' (declared=typing.Sequence; received=MyClass): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence[int]), args(:list[int])",
+            deco_1_params_annot_Sequence_int,
+            (get_random_list(get_random_int),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence[int]), args(:tuple[int])",
+            deco_1_params_annot_Sequence_int,
+            (tuple(get_random_list(get_random_int)),), {},
+            ExpectedReturn(arg_idx_or_kwd=0),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence[int]), args(:list[str])",
+            deco_1_params_annot_Sequence_int,
+            (get_random_list(get_random_str,(),dict(min_len=3,max_len=6)),), {},
+            ExpectedException(ac.exceptions.CallArgEachCheckViolation,
+                    "CallArgEachCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=eachAll(check_applied_to_each=isTypeEqualTo(type_declared=int)), idx_within_sequence=0, value_within_sequence={ex.value_within_sequence!r})",
+                    "violation of sequence check `eachAll(check_applied_to_each=isTypeEqualTo(type_declared=int))` for param [0]='p': _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}) (at sequence element [0]={ex.value_within_sequence!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence[int]), args(:str)",
+            deco_1_params_annot_Sequence_int,
+            (get_random_str(),), {},
+            ExpectedException(ac.exceptions.CallArgEachCheckViolation,
+                    "CallArgEachCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=eachAll(check_applied_to_each=isTypeEqualTo(type_declared=int)), idx_within_sequence=0, value_within_sequence={ex.value_within_sequence!r})",
+                    "violation of sequence check `eachAll(check_applied_to_each=isTypeEqualTo(type_declared=int))` for param [0]='p': _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}) (at sequence element [0]={ex.value_within_sequence!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence[int]), args(:int)",
+            deco_1_params_annot_Sequence_int,
+            (get_random_int(),), {},
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=Sequence), type_declared=typing.Sequence[int], type_received=int)",
+                    "violation of type check `isTypeEqualTo(type_declared=Sequence)` for param [0]='p' (declared=typing.Sequence[int]; received=int): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
+    ),
+
+    TestCase("@validate_call: annot params(:Sequence[int]), args(:MyClass)",
+            deco_1_params_annot_Sequence_int,
+            (MyClass(get_random_int()),), {},
+            ExpectedException(ac.exceptions.CallArgTypeCheckViolation,
+                    "CallArgTypeCheckViolation(param=_DeclFuncParam(idx=0, name='p'), arg_that_caused_failure=_FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r}), check_that_failed=isTypeEqualTo(type_declared=Sequence), type_declared=typing.Sequence[int], type_received=MyClass)",
+                    "violation of type check `isTypeEqualTo(type_declared=Sequence)` for param [0]='p' (declared=typing.Sequence[int]; received=MyClass): _FuncCallArg(idx_or_kwd=0, val={ex.arg_that_caused_failure.val!r})"),
     ),
 
 ]

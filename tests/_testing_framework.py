@@ -159,12 +159,13 @@ def get_random_str(*, min_len=5, max_len=10):
             for i in range(randint(min_len, max_len)))
 
 
-def get_random_list(elem_ctor_func, args_for_elem_ctors:tuple=(), *,
+def get_random_list(elem_ctor_func,
+        pos_args_for_elem_ctors:tuple=(), kwd_args_for_elem_ctors:dict={}, *,
         min_len=1, max_len=6):
     """Return a random-length list of random elements.
 
     The random elements in the list will be constructed by supplied function
-    `elem_ctor_func`, given positional arguments `args_for_elem_ctors`.
+    `elem_ctor_func`, given positional arguments `pos_args_for_elem_ctors`.
 
     The list-length arguments to this function specify a closed-closed range:
     `(min_len=5, max_len=10)`
@@ -172,7 +173,7 @@ def get_random_list(elem_ctor_func, args_for_elem_ctors:tuple=(), *,
     The use of a closed-closed range is intentionally similar to the arguments
     to function `random.randint`.
     """
-    return [elem_ctor_func(*args_for_elem_ctors)
+    return [elem_ctor_func(*pos_args_for_elem_ctors, **kwd_args_for_elem_ctors)
             for i in range(randint(min_len, max_len))]
 
 
