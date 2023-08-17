@@ -1,0 +1,402 @@
+
+[0] normal Python (no @validate_call): 0 params, no annots
+Function: no_deco_0_params_no_annots
+Func-sig: ()
+Pos-args: ()
+Kwd-args: {}
+Expected: expected return-value None
+Received: None
+
+[1] normal Python (no @validate_call): 1 params, no annots
+Function: no_deco_1_params_no_annots
+Func-sig: (p)
+Pos-args: (-584,)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: -584
+
+[2] normal Python (no @validate_call): 2 params, no annots
+Function: no_deco_2_params_no_annots
+Func-sig: (p_1, p_2)
+Pos-args: (-155, -954)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: -155
+
+[3] normal Python (no @validate_call): too few pos-args => expect exception
+Function: no_deco_2_params_no_annots
+Func-sig: (p_1, p_2)
+Pos-args: (-578,)
+Kwd-args: {}
+Expected: expected exception TypeError
+Received: TypeError
+
+[4] normal Python (no @validate_call): too many pos-args => expect exception
+Function: no_deco_2_params_no_annots
+Func-sig: (p_1, p_2)
+Pos-args: (-794, 220, -941)
+Kwd-args: {}
+Expected: expected exception TypeError
+Received: TypeError
+
+[5] normal Python (no @validate_call): undeclared kwd-arg => expect exception
+Function: no_deco_1_params_no_annots
+Func-sig: (p)
+Pos-args: (144,)
+Kwd-args: {'undeclared_kwd': -912}
+Expected: expected exception TypeError
+Received: TypeError
+
+[6] @validate_call: 0 params, no annots
+Function: deco_0_params_no_annots
+Func-sig: ()
+Pos-args: ()
+Kwd-args: {}
+Expected: expected return-value None
+Received: None
+
+[7] @validate_call: 1 params, no annots
+Function: deco_1_params_no_annots
+Func-sig: (p)
+Pos-args: (238,)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 238
+
+[8] @validate_call: 2 params, no annots
+Function: deco_2_params_no_annots
+Func-sig: (p_1, p_2)
+Pos-args: (815, -636)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 815
+
+[9] @validate_call: too few pos-args => expect exception
+Function: deco_2_params_no_annots
+Func-sig: (p_1, p_2)
+Pos-args: (180,)
+Kwd-args: {}
+Expected: expected exception CallArgBindingRejection
+Received: CallArgBindingRejection
+
+[10] @validate_call: too many pos-args => expect exception
+Function: deco_2_params_no_annots
+Func-sig: (p_1, p_2)
+Pos-args: (-35, -844, 58)
+Kwd-args: {}
+Expected: expected exception CallArgBindingRejection
+Received: CallArgBindingRejection
+
+[11] @validate_call: undeclared kwd-arg => expect exception
+Function: deco_1_params_no_annots
+Func-sig: (p)
+Pos-args: (96,)
+Kwd-args: {'undeclared_kwd': -142}
+Expected: expected exception CallArgBindingRejection
+Received: CallArgBindingRejection
+
+[12] @validate_call: annot params(:int, :), args(:int, :int)
+Function: deco_2_params_annot_1_int
+Func-sig: (p_1:int, p_2)
+Pos-args: (-415, -602)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: -415
+
+[13] @validate_call: annot params(:int, :), args(:int, :str)
+Function: deco_2_params_annot_1_int
+Func-sig: (p_1:int, p_2)
+Pos-args: (-565, 'ujbrywwb')
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: -565
+
+[14] @validate_call: annot params(:int, :), args(:str, :int) => expect exception
+Function: deco_2_params_annot_1_int
+Func-sig: (p_1:int, p_2)
+Pos-args: ('urbaxp', 922)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[15] @validate_call: annot params(:, :int), args(:int, :int)
+Function: deco_2_params_annot_2_int
+Func-sig: (p_1, p_2:int)
+Pos-args: (-666, 417)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: -666
+
+[16] @validate_call: annot params(:, :int), args(:int, :str) => expect exception
+Function: deco_2_params_annot_2_int
+Func-sig: (p_1, p_2:int)
+Pos-args: (-824, 'ugrokyuvxy')
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[17] @validate_call: annot params(:, :int), args(:str, :int)
+Function: deco_2_params_annot_2_int
+Func-sig: (p_1, p_2:int)
+Pos-args: ('dugrkepskp', 413)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 'dugrkepskp'
+
+[18] @validate_call: annot params(:int = :int), args(:int)
+Function: deco_1_params_annot_int_dflt_int
+Func-sig: (p:int=33)
+Pos-args: (646,)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 646
+
+[19] @validate_call: annot params(:int = :int), args()
+Function: deco_1_params_annot_int_dflt_int
+Func-sig: (p:int=33)
+Pos-args: ()
+Kwd-args: {}
+Expected: expected return-value 33
+Received: 33
+
+[20] @validate_call: annot params(:int = :int), args(:str) => expect exception
+Function: deco_1_params_annot_int_dflt_int
+Func-sig: (p:int=33)
+Pos-args: ('eglcmr',)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[21] @validate_call: annot params(:int = :str), args(:int)
+Function: deco_1_params_annot_int_dflt_str
+Func-sig: (p:int='hello')
+Pos-args: (220,)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 220
+
+[22] @validate_call: annot params(:int = :str), args() => expect exception
+Function: deco_1_params_annot_int_dflt_str
+Func-sig: (p:int='hello')
+Pos-args: ()
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[23] @validate_call: annot params(:int = :str), args(:str) => expect exception
+Function: deco_1_params_annot_int_dflt_str
+Func-sig: (p:int='hello')
+Pos-args: ('yysob',)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[24] @validate_call: annot params(:MyClass), args(:MyClass)
+Function: deco_1_params_annot_MyClass
+Func-sig: (p:__main__.MyClass)
+Pos-args: (MyClass(227),)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: MyClass(227)
+
+[25] @validate_call: annot params(:MyClass), args(:int) => expect exception
+Function: deco_1_params_annot_MyClass
+Func-sig: (p:__main__.MyClass)
+Pos-args: (-919,)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[26] @validate_call: annot params(:int), args(:int)
+Function: deco_1_params_annot_int
+Func-sig: (p:int)
+Pos-args: (807,)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 807
+
+[27] @validate_call: annot params(:int), args(:MyClass) => expect exception
+Function: deco_1_params_annot_int
+Func-sig: (p:int)
+Pos-args: (MyClass(875),)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[28] @validate_call: annot params(:Sequence), args(:list)
+Function: deco_1_params_annot_Sequence
+Func-sig: (p:typing.Sequence)
+Pos-args: ([-576],)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: [-576]
+
+[29] @validate_call: annot params(:Sequence), args(:tuple)
+Function: deco_1_params_annot_Sequence
+Func-sig: (p:typing.Sequence)
+Pos-args: ((-813, 475, 920, -655, 628, -353),)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: (-813, 475, 920, -655, 628, -353)
+
+[30] @validate_call: annot params(:Sequence), args(:str)
+Function: deco_1_params_annot_Sequence
+Func-sig: (p:typing.Sequence)
+Pos-args: ('vjzvv',)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 'vjzvv'
+
+[31] @validate_call: annot params(:Sequence), args(:int) => expect exception
+Function: deco_1_params_annot_Sequence
+Func-sig: (p:typing.Sequence)
+Pos-args: (-1,)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[32] @validate_call: annot params(:Sequence), args(:MyClass) => expect exception
+Function: deco_1_params_annot_Sequence
+Func-sig: (p:typing.Sequence)
+Pos-args: (MyClass(-712),)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[33] @validate_call: annot params(:Sequence[int]), args(:list[int])
+Function: deco_1_params_annot_Sequence_int
+Func-sig: (p:typing.Sequence)
+Pos-args: ([-131, -680, 757, 994, -570, -890],)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: [-131, -680, 757, 994, -570, -890]
+
+[34] @validate_call: annot params(:Sequence[int]), args(:tuple[int])
+Function: deco_1_params_annot_Sequence_int
+Func-sig: (p:typing.Sequence)
+Pos-args: ((578, -981, 396, 542, -498, -760),)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: (578, -981, 396, 542, -498, -760)
+
+[35] @validate_call: annot params(:Sequence[int]), args(:list[str]) => expect exception
+Function: deco_1_params_annot_Sequence_int
+Func-sig: (p:typing.Sequence)
+Pos-args: (['qiyrd', 'ebl', 'iybym'],)
+Kwd-args: {}
+Expected: expected exception CallArgEachCheckViolation
+Received: CallArgEachCheckViolation
+
+[36] @validate_call: annot params(:Sequence[int]), args(:str) => expect exception
+Function: deco_1_params_annot_Sequence_int
+Func-sig: (p:typing.Sequence)
+Pos-args: ('wigpasb',)
+Kwd-args: {}
+Expected: expected exception CallArgEachCheckViolation
+Received: CallArgEachCheckViolation
+
+[37] @validate_call: annot params(:Sequence[int]), args(:int) => expect exception
+Function: deco_1_params_annot_Sequence_int
+Func-sig: (p:typing.Sequence)
+Pos-args: (16,)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[38] @validate_call: annot params(:Sequence[int]), args(:MyClass) => expect exception
+Function: deco_1_params_annot_Sequence_int
+Func-sig: (p:typing.Sequence)
+Pos-args: (MyClass(-325),)
+Kwd-args: {}
+Expected: expected exception CallArgTypeCheckViolation
+Received: CallArgTypeCheckViolation
+
+[39] @validate_call: annot params(:int>0), args(:int>0)
+Function: deco_1_params_annot_int_isPositive
+Func-sig: (p:typing.Annotated[int, <class 'argcheck.checks.isPositive'>])
+Pos-args: (751,)
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 751
+
+[40] @validate_call: annot params(:int>0), args(:int==0) => expect exception
+Function: deco_1_params_annot_int_isPositive
+Func-sig: (p:typing.Annotated[int, <class 'argcheck.checks.isPositive'>])
+Pos-args: (0,)
+Kwd-args: {}
+Expected: expected exception CallArgValueCheckViolation
+Received: CallArgValueCheckViolation
+
+[41] @validate_call: annot params(:int>0), args(:int<0) => expect exception
+Function: deco_1_params_annot_int_isPositive
+Func-sig: (p:typing.Annotated[int, <class 'argcheck.checks.isPositive'>])
+Pos-args: (-331,)
+Kwd-args: {}
+Expected: expected exception CallArgValueCheckViolation
+Received: CallArgValueCheckViolation
+
+[42] @validate_call: func `construct_conv_net`, all default args
+Function: construct_conv_net
+Func-sig: (in_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=3, out_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=1, num_features_per_scale:typing.Annotated[typing.Sequence, [<class 'argcheck.checks.isNotEmpty'>, <class 'argcheck.checks.isMonotonicIncr'>, eachAll(check_applied_to_each=isPositive())]]=[64, 128, 256, 512])
+Pos-args: ()
+Kwd-args: {}
+Expected: expected return-value 3
+Received: 3
+
+[43] @validate_call: func `construct_conv_net`, all valid args (incr by 1)
+Function: construct_conv_net
+Func-sig: (in_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=3, out_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=1, num_features_per_scale:typing.Annotated[typing.Sequence, [<class 'argcheck.checks.isNotEmpty'>, <class 'argcheck.checks.isMonotonicIncr'>, eachAll(check_applied_to_each=isPositive())]]=[64, 128, 256, 512])
+Pos-args: (425, 241, [470, 471, 472, 473, 474])
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 425
+
+[44] @validate_call: func `construct_conv_net`, all valid args (incr random)
+Function: construct_conv_net
+Func-sig: (in_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=3, out_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=1, num_features_per_scale:typing.Annotated[typing.Sequence, [<class 'argcheck.checks.isNotEmpty'>, <class 'argcheck.checks.isMonotonicIncr'>, eachAll(check_applied_to_each=isPositive())]]=[64, 128, 256, 512])
+Pos-args: (290, 456, [610, 1312, 1732, 2237, 3058])
+Kwd-args: {}
+Expected: expected return-value passed as positional argument 0
+Received: 290
+
+[45] @validate_call: func `construct_conv_net`, empty list => expect exception
+Function: construct_conv_net
+Func-sig: (in_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=3, out_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=1, num_features_per_scale:typing.Annotated[typing.Sequence, [<class 'argcheck.checks.isNotEmpty'>, <class 'argcheck.checks.isMonotonicIncr'>, eachAll(check_applied_to_each=isPositive())]]=[64, 128, 256, 512])
+Pos-args: (675, 918, [])
+Kwd-args: {}
+Expected: expected exception CallArgValueCheckViolation
+Received: CallArgValueCheckViolation
+
+[46] @validate_call: func `construct_conv_net`, list of a single 0 => expect exception
+Function: construct_conv_net
+Func-sig: (in_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=3, out_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=1, num_features_per_scale:typing.Annotated[typing.Sequence, [<class 'argcheck.checks.isNotEmpty'>, <class 'argcheck.checks.isMonotonicIncr'>, eachAll(check_applied_to_each=isPositive())]]=[64, 128, 256, 512])
+Pos-args: (938, 767, [0])
+Kwd-args: {}
+Expected: expected exception CallArgEachCheckViolation
+Received: CallArgEachCheckViolation
+
+[47] @validate_call: func `construct_conv_net`, list of multiple 0s => expect exception
+Function: construct_conv_net
+Func-sig: (in_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=3, out_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=1, num_features_per_scale:typing.Annotated[typing.Sequence, [<class 'argcheck.checks.isNotEmpty'>, <class 'argcheck.checks.isMonotonicIncr'>, eachAll(check_applied_to_each=isPositive())]]=[64, 128, 256, 512])
+Pos-args: (387, 72, [0, 0, 0, 0, 0, 0, 0])
+Kwd-args: {}
+Expected: expected exception CallArgValueCheckViolation
+Received: CallArgValueCheckViolation
+
+[48] @validate_call: func `construct_conv_net`, list of a single -1 => expect exception
+Function: construct_conv_net
+Func-sig: (in_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=3, out_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=1, num_features_per_scale:typing.Annotated[typing.Sequence, [<class 'argcheck.checks.isNotEmpty'>, <class 'argcheck.checks.isMonotonicIncr'>, eachAll(check_applied_to_each=isPositive())]]=[64, 128, 256, 512])
+Pos-args: (686, 868, [-1])
+Kwd-args: {}
+Expected: expected exception CallArgEachCheckViolation
+Received: CallArgEachCheckViolation
+
+[49] @validate_call: func `construct_conv_net`, positive ints (incr by -1) => expect exception
+Function: construct_conv_net
+Func-sig: (in_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=3, out_channels:typing.Annotated[int, <class 'argcheck.checks.isPositive'>]=1, num_features_per_scale:typing.Annotated[typing.Sequence, [<class 'argcheck.checks.isNotEmpty'>, <class 'argcheck.checks.isMonotonicIncr'>, eachAll(check_applied_to_each=isPositive())]]=[64, 128, 256, 512])
+Pos-args: (91, 804, [581, 580, 579, 578, 577, 576, 575, 574])
+Kwd-args: {}
+Expected: expected exception CallArgValueCheckViolation
+Received: CallArgValueCheckViolation
+
+All tests passed: 50 of 50
