@@ -30,7 +30,8 @@ def construct_conv_net(
 Currently-implemented argument checks
 -------------------------------------
 
-- `isTypeEqualTo(specified_type)`: check the declared parameter type
+- `isTypeEqualTo(specified_type)`: check for equality to declared parameter type
+- `isTypeSequence(specified_type)`: check for a sequence type
 - `isNotEmpty`: verify that a container of values is NOT empty
 - `isMonotonicIncr`: verify that a sequence of values is monotonic increasing
 - `isPositive`: verify that a numeric value is positive

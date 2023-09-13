@@ -6,7 +6,8 @@ There are many like it; this one is mine.
 Project repo with LICENSE and tests: https://github.com/jboy/argcheck-python3
 """
 
-from .checks import (isTypeEqualTo, isNotEmpty, isMonotonicIncr, isPositive,
+from .checks import (isTypeEqualTo, isTypeSequence,
+        isNotEmpty, isMonotonicIncr, isPositive,
         eachAll)
 
 from .exceptions import (ArgCheckException,
