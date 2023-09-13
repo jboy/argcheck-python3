@@ -342,6 +342,17 @@ def _complain_test_failure(test_idx: int, test_case: TestCase, *,
             t=test_case, idx=test_idx, complaint=complaint)
 
     if extra_info:
+        if isinstance(extra_info, dict):
+            # For improved readability, format `dict` instances specially:
+            # Format each (key, val) pair on its own line.
+            #
+            # Note that `extra_info` must be a non-empty `dict` because
+            # `if extra_info:` evaluated to True.
+            key_vals = "\n\n".join(
+                    ("\t%r:\n\t\t%r," % key_val_tup)
+                    for key_val_tup in extra_info.items())
+            extra_info = "{\n%s\n}" % key_vals
+
         msg = "%sExtra info: %s\n" % (msg, extra_info)
 
     _die(msg, error_stream=error_stream)
