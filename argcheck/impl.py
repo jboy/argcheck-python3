@@ -7,11 +7,13 @@ import functools
 
 from abc import ABC, abstractmethod
 from collections import namedtuple
+from collections.abc import Sequence as abc_Sequence
 from inspect import isclass, signature, Parameter
 from typing import Sequence
 
 from .better_repr import _get_repr_that_recreates
-from .checks import _AbstractArgValueCheck, isTypeEqualTo, eachAll
+from .checks import (_AbstractArgValueCheck,
+        isTypeEqualTo, isTypeSequence, eachAll)
 from .exceptions import (
         _InternalExecutionError, AnnotationCompilationError,
         CallArgBindingRejection, CallArgCheckExecutionError)
@@ -370,7 +372,8 @@ def _eval_PEP_484_param_annot(func_name, param_idx, param_name, annot):
         # that the function should not return nested tuples-of-tuples.
         return type_to_check + metadata_to_check
 
-    elif hasattr(annot, "__origin__") and (annot.__origin__ == Sequence):
+    elif hasattr(annot, "__origin__") and (
+            annot.__origin__ in (Sequence, abc_Sequence)):
         # It's `typing.Sequence`, a "generic" class type.
         # We want to type-check its nested generic type argument.
         # It appears that the `typing` module checks the number of arguments
@@ -380,7 +383,7 @@ def _eval_PEP_484_param_annot(func_name, param_idx, param_name, annot):
         check_for_nested_type = _eval_PEP_484_param_annot(
                 func_name, param_idx, param_name, annot.__args__[0])
         # Now we want to wrap this check in an `eachAll`.
-        return (isTypeEqualTo(annot), eachAll(check_for_nested_type[0]))
+        return (isTypeSequence(annot), eachAll(check_for_nested_type[0]))
 
     # Base case of recursion: the annotation is simply a type
     # (such as `int`, which is a value of type `<class 'type'>`).

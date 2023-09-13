@@ -68,6 +68,15 @@ class isTypeEqualTo(_AbstractTypeCheck):
         return isinstance(x, self.type_declared)
 
 
+class isTypeSequence(_AbstractTypeCheck):
+    """Check whether the argument type is a sequence type."""
+    def __init__(self, type_declared):
+        super().__init__(type_declared)
+
+    def is_valid(self, x) -> bool:
+        return (hasattr(x, '__len__') and hasattr(x, '__getitem__'))
+
+
 class _AbstractArgValueCheck(_AbstractCheck):
     """Abstract base class for checks of argument value preconditions."""
     def to_raise_on_failed_check(self, param, arg) -> Exception:
