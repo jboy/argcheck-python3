@@ -68,13 +68,64 @@ class isTypeEqualTo(_AbstractTypeCheck):
         return isinstance(x, self.type_declared)
 
 
-class isTypeSequence(_AbstractTypeCheck):
-    """Check whether the argument type is a sequence type."""
+class isTypeOfSequence(_AbstractTypeCheck):
+    """Check whether the argument type is of a sequence type."""
     def __init__(self, type_declared):
         super().__init__(type_declared)
 
     def is_valid(self, x) -> bool:
-        return (hasattr(x, '__len__') and hasattr(x, '__getitem__'))
+        # Before Python3.7, this test was very easy:
+        # You could use `isinstance(value, type)` to check generic types:
+        #       >>> import typing
+        #       >>> some_list = [1, 2, 3]
+        #       >>> isinstance(some_list, typing.Sequence[int])
+        #       True
+        #
+        # But from Python3.7 onwards, this no longer works. :(
+        # [Read the long comment at the start of `argcheck/impl.py`
+        # for the full error message in all its glory.]
+        # And here's a Stack Overflow question about this,
+        # from someone with the same problem:
+        #  https://stackoverflow.com/questions/53854463/python-3-7-check-if-type-annotation-is-subclass-of-generic
+        #
+        # So now we use duck-typing, to check for the following attributes
+        # that are listed for `collections.abc.Sequence`:
+        #  https://docs.python.org/3/library/collections.abc.html
+        #
+        #   - `__getitem__`
+        #   - `__len__`
+        #   - `__contains__`
+        #   - `__iter__`
+        #   - `__reversed__`
+        #   - `index`
+        #   - `count`
+        #
+        # As you would hope/expect, this accepts `list` and rejects `dict`.
+        # Note: This rejects both `str` and `tuple`, neither of which have
+        # attribute `__reversed__`:
+        #
+        #       >>> hasattr("", '__reversed__')
+        #       False
+        #       >>> hasattr((), '__reversed__')
+        #       False
+        #
+        # Both `typing.Sequence` and `collections.abc.Sequence` define the
+        # `Sequence` type as `Reversible`, so this must be intentional:
+        #  https://docs.python.org/3/library/typing.html#typing.Sequence
+        #  https://docs.python.org/3/library/collections.abc.html#collections-abstract-base-classes
+        #
+        # Oh well, sorry `str` and `tuple`.  We'll never forget that magic time
+        # when you were `isinstance(x, typing.Sequence)` in Python3.5!
+        #
+        #       >>> isinstance("", typing.Sequence)
+        #       True
+        #       >>> isinstance((), typing.Sequence)
+        #       True
+        #
+        return (hasattr(x, '__getitem__') and hasattr(x, '__len__') and
+                hasattr(x, '__contains__') and hasattr(x, '__iter__') and
+                hasattr(x, '__reversed__') and
+                hasattr(x, 'index') and hasattr(x, 'count'))
 
 
 class _AbstractArgValueCheck(_AbstractCheck):
