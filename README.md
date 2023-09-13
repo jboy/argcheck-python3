@@ -75,8 +75,14 @@ should also still work.
 Use of generic Sequence type `typing.Sequence[T]`
 -------------------------------------------------
 
-This code was originally written on Python 3.5, so it uses `typing.Sequence`
-rather than `collections.abc.Sequence` as its "generic Sequence" type.
+This code was originally written on Python 3.5, so it uses
+[`typing.Sequence`](https://docs.python.org/3/library/typing.html#typing.Sequence)
+rather than
+[`collections.abc.Sequence`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)
+as its "generic Sequence" type:
+
+- [https://docs.python.org/3/library/typing.html#typing.Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)
+- [https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)
 
 Why?
 
@@ -84,9 +90,6 @@ Gather round, kids, while grampa tells you a story about the Before Time...
 
 Before Python3.9,
 `typing.Sequence` was a distinct type from `collections.abc.Sequence`:
-
-- [https://docs.python.org/3/library/typing.html#typing.Sequence](https://docs.python.org/3/library/typing.html#typing.Sequence)
-- [https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence](https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence)
 
 ```python
 # in file `/usr/lib/python3.5/typing.py`:
@@ -112,7 +115,7 @@ Sequence = _alias(collections.abc.Sequence, 1)
 
 Also, before Python3.9,
 `collections.abc.Sequence` didn't support subscripting (`[]`),
-(which is needed to enable a generic alias type in annotations).
+which is needed to enable a generic alias type in annotations.
 Only `typing.Sequence` supported subscripting:
 
 ```python
@@ -142,9 +145,6 @@ typing.Sequence[int]
 collections.abc.Sequence[int]
 >>>
 ```
-
-This code was originally written on Python 3.5, so it uses `typing.Sequence`
-rather than `collections.abc.Sequence` as its "generic Sequence" type.
 
 Also, before Python 3.7,
 you could use `isinstance(value, type)` to check generic types:
